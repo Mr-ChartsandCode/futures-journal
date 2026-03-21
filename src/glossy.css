@@ -1,0 +1,168 @@
+.card {
+  background: linear-gradient(160deg, var(--card-top) 0%, var(--card) 100%);
+  border: 1px solid var(--border);
+  border-top-color: var(--border-hi);
+  border-radius: 10px;
+  box-shadow: var(--glow-card), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.card-inner {
+  background: linear-gradient(180deg, #141414 0%, #0c0c0c 100%);
+  border: 1px solid var(--border);
+  border-top-color: var(--border2);
+  border-radius: 7px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #1a90ff 0%, #0070dd 100%);
+  border: 1px solid #0060cc;
+  border-top-color: #40a0ff;
+  box-shadow: 0 2px 8px rgba(0, 100, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  transition: box-shadow 0.15s, transform 0.1s;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(0, 100, 255, 0.45), inset 0 1px 0 rgba(255,255,255,0.2);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0px);
+  box-shadow: 0 1px 4px rgba(0, 100, 255, 0.3);
+}
+
+.btn-ghost {
+  background: linear-gradient(180deg, #1a1a1a 0%, #111111 100%);
+  border: 1px solid var(--border2);
+  border-top-color: var(--border-hi);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  color: var(--muted);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-ghost:hover {
+  border-color: #444;
+  color: var(--text);
+}
+
+.pill-active {
+  background: linear-gradient(180deg, #002050 0%, #001438 100%);
+  border: 1px solid #0060cc;
+  border-top-color: #0080ff;
+  box-shadow: 0 0 8px rgba(0,100,255,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+  color: var(--blue-text);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.pill-inactive {
+  background: linear-gradient(180deg, #181818 0%, #101010 100%);
+  border: 1px solid var(--border);
+  border-top-color: var(--border2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  color: var(--muted);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.pill-inactive:hover {
+  border-color: #444;
+  color: var(--text);
+}
+
+.tab-active {
+  background: linear-gradient(180deg, #222222 0%, #161616 100%);
+  border: 1px solid var(--border2);
+  border-top-color: var(--border-hi);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  color: var(--text);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.tab-inactive {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  border-radius: 5px;
+  font-size: 11px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.tab-inactive:hover { color: var(--text); }
+
+.stat-card {
+  background: linear-gradient(160deg, #161616 0%, #0c0c0c 100%);
+  border: 1px solid var(--border);
+  border-top-color: var(--border-hi);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: var(--glow-card), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.direction-long {
+  background: linear-gradient(180deg, #001e44 0%, #001230 100%);
+  border: 1px solid #003080;
+  border-top-color: #0060cc;
+  color: var(--blue-text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.direction-short {
+  background: linear-gradient(180deg, #200010 0%, #14000a 100%);
+  border: 1px solid #600020;
+  border-top-color: #cc0030;
+  color: var(--red-text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.direction-inactive {
+  background: linear-gradient(180deg, #141414 0%, #0e0e0e 100%);
+  border: 1px solid transparent;
+  color: var(--muted);
+}
+
+.pnl-positive {
+  color: var(--profit);
+  text-shadow: 0 0 20px rgba(0, 132, 255, 0.4);
+}
+
+.pnl-negative {
+  color: var(--loss);
+  text-shadow: 0 0 20px rgba(255, 32, 32, 0.4);
+}
+
+.topbar {
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(22,22,22,0.9) 0%, rgba(8,8,8,0) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}

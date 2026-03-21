@@ -1,0 +1,71 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:      #000000;
+  --surface:    #080808;
+  --card:       #0f0f0f;
+  --card-top:   #161616;
+  --border:     #1e1e1e;
+  --border2:    #282828;
+  --border-hi:  #333333;
+  --text:       #f0f0f0;
+  --muted:      #555555;
+  --muted2:     #2a2a2a;
+  --blue:       #0084ff;
+  --blue-hi:    #40a8ff;
+  --blue-dim:   #001830;
+  --blue-text:  #70c0ff;
+  --red:        #ff2020;
+  --red-hi:     #ff5555;
+  --red-dim:    #1e0000;
+  --red-text:   #ff8080;
+  --profit:     #0084ff;
+  --profit-dim: #001830;
+  --profit-txt: #70c0ff;
+  --loss:       #ff2020;
+  --loss-dim:   #1e0000;
+  --loss-txt:   #ff8080;
+  --font:       'Times New Roman', Times, serif;
+  --glow-card:  0 2px 12px rgba(0, 0, 0, 0.9);
+}
+
+html, body, #root {
+  background: #000000;
+  background-image: radial-gradient(ellipse at 50% 0%, #1a1a1a 0%, #000000 70%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+input, select, textarea, button {
+  font-family: var(--font);
+  font-size: 16px;
+  color: var(--text);
+}
+
+input, select, textarea {
+  background: linear-gradient(180deg, #111111 0%, #0a0a0a 100%);
+  border: 1px solid var(--border2);
+  border-top-color: var(--border-hi);
+  border-radius: 6px;
+  padding: 7px 10px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #444444;
+  border-top-color: #555555;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+}
+
+select option { background: #0f0f0f; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #000000; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
