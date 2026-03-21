@@ -14,6 +14,13 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const { trades, loading } = useTrades()
   const [period, setPeriod] = useState('1M')
+  const [filterInstruments, setFilterInstruments] = useState([])
+  const [filterDirection, setFilterDirection] = useState('')
+  const [filterTags, setFilterTags] = useState([])
+  const [filterEmotion, setFilterEmotion] = useState('')
+  const [filterDateFrom, setFilterDateFrom] = useState('')
+  const [filterDateTo, setFilterDateTo] = useState('')
+  const [showDateRange, setShowDateRange] = useState(false)
 
   const filtered = useMemo(() => {
     const now = new Date()
@@ -25,6 +32,21 @@ export default function Dashboard() {
     }[period]
     return trades.filter(t => new Date(t.trade_date) >= cutoff)
   }, [trades, period])
+
+  const tradeFiltered = useMemo(() => {
+    return filtered.filter(t => {
+      if (filterInstruments.length && !filterInstruments.includes(t.instrument)) return false
+      if (filterDirection && t.direction !== filterDirection) return false
+      if (filterEmotion && t.emotion !== filterEmotion) return false
+      if (filterDateFrom && t.trade_date < filterDateFrom) return false
+      if (filterDateTo && t.trade_date > filterDateTo) return false
+      if (filterTags.length) {
+        const tradeTags = t.trade_tags?.map(tt => tt.tags?.name).filter(Boolean) || []
+        if (!filterTags.every(tag => tradeTags.includes(tag))) return false
+      }
+      return true
+    })
+  }, [filtered, filterInstruments, filterDirection, filterEmotion, filterDateFrom, filterDateTo, filterTags])
 
   const stats = useMemo(() => {
     if (!filtered.length) return null
@@ -74,6 +96,31 @@ export default function Dashboard() {
     if (pnl < 0)    return { bg: 'linear-gradient(160deg,#180006,#100004)', color: '#cc4040', glow: 'none' }
     return { bg: 'var(--surface)', color: 'var(--muted)', glow: 'none' }
   }
+
+  function toggleArr(arr, setArr, val) {
+    setArr(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val])
+  }
+
+  function clearFilters() {
+    setFilterInstruments([])
+    setFilterDirection('')
+    setFilterTags([])
+    setFilterEmotion('')
+    setFilterDateFrom('')
+    setFilterDateTo('')
+    setShowDateRange(false)
+  }
+
+  const hasFilters = filterInstruments.length || filterDirection || filterTags.length || filterEmotion || filterDateFrom || filterDateTo
+
+  const activeFilterLabel = [
+    ...filterInstruments,
+    filterDirection ? filterDirection.toUpperCase() : '',
+    ...filterTags,
+    filterEmotion ? filterEmotion.replace('_', ' ') : '',
+    filterDateFrom ? `from ${filterDateFrom}` : '',
+    filterDateTo ? `to ${filterDateTo}` : '',
+  ].filter(Boolean).join(' · ')
 
   const fmt = (n) => `${n >= 0 ? '+' : '-'}$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
@@ -184,29 +231,97 @@ export default function Dashboard() {
           </div>
 
           <div className="card" style={{ padding: '12px 14px' }}>
-            <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Recent trades</div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {filtered.slice(0, 8).map((t, i) => (
-                <div key={t.id} onClick={() => navigate(`/trade/${t.id}`)} style={{
-                  display: 'grid', gridTemplateColumns: '40px 36px 1fr auto',
-                  alignItems: 'center', gap: 8, padding: '7px 0',
-                  borderBottom: i < Math.min(filtered.length, 8) - 1 ? '1px solid var(--border)' : 'none',
-                  cursor: 'pointer', transition: 'background 0.1s', borderRadius: 4,
-                }}>
-                  <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: 12 }}>{t.instrument}</span>
-                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', color: t.direction === 'long' ? 'var(--blue-text)' : 'var(--red-text)' }}>
-                    {t.direction === 'long' ? 'LONG' : 'SHRT'}
-                  </span>
-                  <span style={{ fontSize: 10, color: 'var(--muted)' }}>{t.trade_date}</span>
-                  <span className={t.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'} style={{ fontSize: 12, fontWeight: 700, textAlign: 'right' }}>
-                    {fmt(t.pnl)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+  <div style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Recent trades</div>
 
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+    <span style={{ fontSize: 10, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Instrument</span>
+    {['ES','NQ','CL','GC','MES','MNQ','MCL','MGC'].map(inst => (
+      <button key={inst} onClick={() => toggleArr(filterInstruments, setFilterInstruments, inst)}
+        className={filterInstruments.includes(inst) ? 'pill-active' : 'pill-inactive'}
+        style={{ padding: '3px 8px', fontSize: 10 }}>{inst}</button>
+    ))}
+  </div>
+
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+    <span style={{ fontSize: 10, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Direction</span>
+    {['long','short'].map(d => (
+      <button key={d} onClick={() => setFilterDirection(prev => prev === d ? '' : d)}
+        className={filterDirection === d ? 'pill-active' : 'pill-inactive'}
+        style={{ padding: '3px 8px', fontSize: 10 }}>{d.toUpperCase()}</button>
+    ))}
+  </div>
+
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+    <span style={{ fontSize: 10, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Setup</span>
+    {['Breakout','Pullback','VWAP reclaim','Opening range','Trend follow','Reversal','News play'].map(tag => (
+      <button key={tag} onClick={() => toggleArr(filterTags, setFilterTags, tag)}
+        className={filterTags.includes(tag) ? 'pill-active' : 'pill-inactive'}
+        style={{ padding: '3px 8px', fontSize: 10 }}>{tag}</button>
+    ))}
+  </div>
+
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+    <span style={{ fontSize: 10, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Emotion</span>
+    {['focused','confident','anxious','rushed','revenge_trading','fomo','neutral','tired'].map(e => (
+      <button key={e} onClick={() => setFilterEmotion(prev => prev === e ? '' : e)}
+        className={filterEmotion === e ? 'pill-active' : 'pill-inactive'}
+        style={{ padding: '3px 8px', fontSize: 10 }}>{e.replace('_', ' ')}</button>
+    ))}
+  </div>
+
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 8 }}>
+    <span style={{ fontSize: 10, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Date range</span>
+    <button onClick={() => setShowDateRange(p => !p)}
+      className={showDateRange ? 'pill-active' : 'pill-inactive'}
+      style={{ padding: '3px 8px', fontSize: 10 }}>{showDateRange ? 'HIDE' : 'SET RANGE'}</button>
+    {showDateRange && (<>
+      <input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
+        style={{ width: 130, fontSize: 10, padding: '3px 6px' }} />
+      <span style={{ fontSize: 10, color: 'var(--muted)' }}>to</span>
+      <input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
+        style={{ width: 130, fontSize: 10, padding: '3px 6px' }} />
+    </>)}
+    {hasFilters && (
+      <button onClick={clearFilters} style={{ marginLeft: 'auto', fontSize: 10, padding: '3px 10px', borderRadius: 4, border: '1px solid #2a0000', background: 'transparent', color: 'var(--red)', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
+        CLEAR ALL
+      </button>
+    )}
+  </div>
+
+  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8, marginBottom: 8 }}>
+    <span style={{ fontSize: 10, color: 'var(--muted2)', letterSpacing: '0.05em' }}>
+      {hasFilters
+        ? `SHOWING ${tradeFiltered.length} OF ${filtered.length} TRADES · ${activeFilterLabel}`
+        : `${filtered.length} TRADES`}
+    </span>
+  </div>
+
+  <div style={{ display: 'flex', flexDirection: 'column' }}>
+    {tradeFiltered.slice(0, 8).map((t, i) => (
+      <div key={t.id} onClick={() => navigate(`/trade/${t.id}`)} style={{
+        display: 'grid', gridTemplateColumns: '44px 40px 1fr auto',
+        alignItems: 'center', gap: 8, padding: '7px 0',
+        borderBottom: i < Math.min(tradeFiltered.length, 8) - 1 ? '1px solid var(--border)' : 'none',
+        cursor: 'pointer',
+      }}>
+        <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: 12 }}>{t.instrument}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', color: t.direction === 'long' ? 'var(--blue-text)' : 'var(--red-text)' }}>
+          {t.direction === 'long' ? 'LONG' : 'SHRT'}
+        </span>
+        <span style={{ fontSize: 10, color: 'var(--muted)' }}>{t.trade_date}</span>
+        <span className={t.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'} style={{ fontSize: 12, fontWeight: 700, textAlign: 'right' }}>
+          {fmt(t.pnl)}
+        </span>
+      </div>
+    ))}
+    {tradeFiltered.length === 0 && (
+      <div style={{ fontSize: 11, color: 'var(--muted)', padding: '12px 0', textAlign: 'center', letterSpacing: '0.05em' }}>
+        NO TRADES MATCH THESE FILTERS
+      </div>
+    )}
+  </div>
+</div>
+        </div>
       </>)}
     </div>
   )
