@@ -142,10 +142,10 @@ export default function Dashboard() {
       </div>
 
       {loading ? (
-        <div style={{ color: 'var(--muted)', padding: '2rem', textAlign: 'center', fontSize: 14, letterSpacing: '0.05em' }}>LOADING...</div>
+        <div style={{ color: 'var(--muted)', padding: '2rem', textAlign: 'center', fontSize: 13, letterSpacing: '0.05em' }}>LOADING...</div>
       ) : !stats ? (
         <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--muted)' }}>
-          <div style={{ fontSize: 14, marginBottom: 16, letterSpacing: '0.05em' }}>NO TRADES FOR THIS PERIOD</div>
+          <div style={{ fontSize: 13, marginBottom: 16, letterSpacing: '0.05em' }}>NO TRADES FOR THIS PERIOD</div>
           <button className="btn-primary" onClick={() => navigate('/add')} style={{ padding: '8px 20px' }}>+ NEW TRADE</button>
         </div>
       ) : (<>
@@ -158,7 +158,7 @@ export default function Dashboard() {
             { label: 'Profit factor', value: stats.profitFactor, cls: '', sub: `Expect. $${stats.expectancy}` },
           ].map(({ label, value, cls, sub }) => (
             <div key={label} className="stat-card">
-              <div style={{ fontSize: 14, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
+              <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
               <div className={cls} style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>{value}</div>
               <div style={{ fontSize: 15, color: 'var(--muted)', marginTop: 3 }}>{sub}</div>
             </div>
@@ -167,7 +167,7 @@ export default function Dashboard() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, marginBottom: 8 }}>
           <div className="card" style={{ padding: '12px 14px' }}>
-            <div style={{ fontSize: 14, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Equity curve</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Equity curve</div>
             <ResponsiveContainer width="100%" height={120}>
               <LineChart data={equityData}>
                 <XAxis dataKey="i" hide />
@@ -178,7 +178,7 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
           <div className="card" style={{ padding: '12px 14px' }}>
-            <div style={{ fontSize: 14, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Daily P&L</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Daily P&L</div>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dailyData} barCategoryGap="20%">
                 <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#3a3a5a' }} axisLine={false} tickLine={false} />
@@ -194,7 +194,7 @@ export default function Dashboard() {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           <div className="card" style={{ padding: '14px' }}>
-            <div style={{ fontSize: 14, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{format(now, 'MMMM yyyy')}</div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{format(now, 'MMMM yyyy')}</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 5 }}>
               {['Mon','Tue','Wed','Thu','Fri'].map((d, i) => (
                 <div key={i} style={{ fontSize: 15, color: 'var(--muted)', textAlign: 'center', paddingBottom: 8, fontWeight: 600, letterSpacing: '0.04em' }}>{d}</div>
@@ -219,9 +219,9 @@ export default function Dashboard() {
                     border: pnl !== undefined ? '1px solid rgba(255,255,255,0.06)' : '1px solid var(--border)',
                     padding: '6px 4px',
                   }}>
-                    <span style={{ fontSize: 14, color: 'var(--muted)', fontWeight: 500 }}>{format(day, 'd')}</span>
+                    <span style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 500 }}>{format(day, 'd')}</span>
                     {pnl !== undefined
-                      ? <span style={{ fontSize: 15, fontWeight: 700, color, lineHeight: 1 }}>{pnl >= 0 ? '+' : ''}{Math.round(pnl)}</span>
+                      ? <span style={{ fontSize: 15, fontWeight: 700, color, lineHeight: 1 }}>{pnl >= 0 ? '+' : '-'}{Math.round(pnl)}</span>
                       : <span style={{ fontSize: 15, color: 'var(--muted2)' }}>—</span>
                     }
                   </div>
@@ -231,65 +231,65 @@ export default function Dashboard() {
           </div>
 
           <div className="card" style={{ padding: '12px 14px' }}>
-  <div style={{ fontSize: 14, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Recent trades</div>
+  <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Recent trades</div>
 
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 14, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Instrument</span>
+    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Instrument</span>
     {['ES','NQ','CL','GC','MES','MNQ','MCL','MGC'].map(inst => (
       <button key={inst} onClick={() => toggleArr(filterInstruments, setFilterInstruments, inst)}
         className={filterInstruments.includes(inst) ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 14 }}>{inst}</button>
+        style={{ padding: '3px 8px', fontSize: 13 }}>{inst}</button>
     ))}
   </div>
 
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 14, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Direction</span>
+    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Direction</span>
     {['long','short'].map(d => (
       <button key={d} onClick={() => setFilterDirection(prev => prev === d ? '' : d)}
         className={filterDirection === d ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 14 }}>{d.toUpperCase()}</button>
+        style={{ padding: '3px 8px', fontSize: 13 }}>{d.toUpperCase()}</button>
     ))}
   </div>
 
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 14, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Setup</span>
+    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Setup</span>
     {['Breakout','Pullback','VWAP reclaim','Opening range','Trend follow','Reversal','News play'].map(tag => (
       <button key={tag} onClick={() => toggleArr(filterTags, setFilterTags, tag)}
         className={filterTags.includes(tag) ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 14 }}>{tag}</button>
+        style={{ padding: '3px 8px', fontSize: 13 }}>{tag}</button>
     ))}
   </div>
 
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 14, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Emotion</span>
+    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Emotion</span>
     {['focused','confident','anxious','rushed','revenge_trading','fomo','neutral','tired'].map(e => (
       <button key={e} onClick={() => setFilterEmotion(prev => prev === e ? '' : e)}
         className={filterEmotion === e ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 14 }}>{e.replace('_', ' ')}</button>
+        style={{ padding: '3px 8px', fontSize: 13 }}>{e.replace('_', ' ')}</button>
     ))}
   </div>
 
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 8 }}>
-    <span style={{ fontSize: 14, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Date range</span>
+    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Date range</span>
     <button onClick={() => setShowDateRange(p => !p)}
       className={showDateRange ? 'pill-active' : 'pill-inactive'}
-      style={{ padding: '3px 8px', fontSize: 14 }}>{showDateRange ? 'HIDE' : 'SET RANGE'}</button>
+      style={{ padding: '3px 8px', fontSize: 13 }}>{showDateRange ? 'HIDE' : 'SET RANGE'}</button>
     {showDateRange && (<>
       <input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
-        style={{ width: 130, fontSize: 14, padding: '3px 6px' }} />
-      <span style={{ fontSize: 14, color: 'var(--muted)' }}>to</span>
+        style={{ width: 130, fontSize: 13, padding: '3px 6px' }} />
+      <span style={{ fontSize: 13, color: 'var(--muted)' }}>to</span>
       <input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
-        style={{ width: 130, fontSize: 14, padding: '3px 6px' }} />
+        style={{ width: 130, fontSize: 13, padding: '3px 6px' }} />
     </>)}
     {hasFilters && (
-      <button onClick={clearFilters} style={{ marginLeft: 'auto', fontSize: 14, padding: '3px 10px', borderRadius: 4, border: '1px solid #2a0000', background: 'transparent', color: 'var(--red)', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
+      <button onClick={clearFilters} style={{ marginLeft: 'auto', fontSize: 13, padding: '3px 10px', borderRadius: 4, border: '1px solid #2a0000', background: 'transparent', color: 'var(--red)', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
         CLEAR ALL
       </button>
     )}
   </div>
 
   <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8, marginBottom: 8 }}>
-    <span style={{ fontSize: 14, color: 'var(--muted2)', letterSpacing: '0.05em' }}>
+    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.05em' }}>
       {hasFilters
         ? `SHOWING ${tradeFiltered.length} OF ${filtered.length} TRADES · ${activeFilterLabel}`
         : `${filtered.length} TRADES`}
@@ -304,12 +304,12 @@ export default function Dashboard() {
         borderBottom: i < Math.min(tradeFiltered.length, 8) - 1 ? '1px solid var(--border)' : 'none',
         cursor: 'pointer',
       }}>
-        <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: 14 }}>{t.instrument}</span>
-        <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.05em', color: t.direction === 'long' ? 'var(--blue-text)' : 'var(--red-text)' }}>
+        <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: 13 }}>{t.instrument}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', color: t.direction === 'long' ? 'var(--blue-text)' : 'var(--red-text)' }}>
           {t.direction === 'long' ? 'LONG' : 'SHRT'}
         </span>
-        <span style={{ fontSize: 14, color: 'var(--muted)' }}>{t.trade_date}</span>
-        <span className={t.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'} style={{ fontSize: 14, fontWeight: 700, textAlign: 'right' }}>
+        <span style={{ fontSize: 13, color: 'var(--muted)' }}>{t.trade_date}</span>
+        <span className={t.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'} style={{ fontSize: 13, fontWeight: 700, textAlign: 'right' }}>
           {fmt(t.pnl)}
         </span>
       </div>
