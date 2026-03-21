@@ -126,7 +126,10 @@ export default function TradeDetail() {
         </div>
       )}
 
-      <div style={{ marginTop: 8 }}>
+<div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <button onClick={() => navigate(`/trade/${id}/edit`)} className="btn-primary" style={{ width: '100%', padding: '8px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em' }}>
+          EDIT TRADE
+        </button>
         {!confirmDelete ? (
           <button onClick={handleDelete} className="btn-ghost" style={{ width: '100%', padding: '8px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--red)', borderColor: '#2a0010' }}>
             DELETE TRADE

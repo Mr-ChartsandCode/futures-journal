@@ -4,6 +4,7 @@ import { supabase } from './lib/supabase'
 import Dashboard from './pages/Dashboard'
 import AddTrade from './pages/AddTrade'
 import TradeDetail from './pages/TradeDetail'
+import EditTrade from './pages/EditTrade'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/add" element={<AddTrade />} />
         <Route path="/trade/:id" element={<TradeDetail />} />
+        <Route path="/trade/:id/edit" element={<EditTrade />} />
       </Routes>
     </BrowserRouter>
   )
