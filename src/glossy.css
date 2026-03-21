@@ -166,3 +166,20 @@
   padding-bottom: 12px;
   margin-bottom: 12px;
 }
+
+.stat-card .stat-val { font-size: 24px; }
+
+.pill-active, .pill-inactive {
+  font-size: 13px !important;
+  padding: 5px 12px !important;
+}
+
+.tab-active, .tab-inactive {
+  font-size: 12px !important;
+  padding: 5px 12px !important;
+}
+
+.btn-primary, .btn-ghost {
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+}

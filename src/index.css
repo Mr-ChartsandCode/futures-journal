@@ -41,6 +41,14 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
+html {
+  font-size: 16px;
+}
+
+.card-label, .filter-label {
+  font-size: 12px !important;
+}
+
 input, select, textarea, button {
   font-family: var(--font);
   font-size: 16px;
