@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       fetch(`https://financialmodelingprep.com/stable/price-target-consensus?symbol=${symbol}&apikey=${key}`),
       fetch(`https://financialmodelingprep.com/stable/price-target-summary?symbol=${symbol}&apikey=${key}`),
       fetch(`https://financialmodelingprep.com/stable/analyst-estimates?symbol=${symbol}&period=annual&apikey=${key}&limit=3`),
-      fetch(`https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=${symbol}&apikey=${key}&from=2015-01-01`),
+      fetch(`https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=${symbol}&apikey=${key}&from=2010-01-01&to=${new Date().toISOString().split('T')[0]}`),
     ])
 
     const parse = async (r) => {
@@ -62,18 +62,31 @@ export default async function handler(req, res) {
       '10Y': getPriceChange(3650),
     }
 
-    res.status(200).json({
-      profile: profile?.[0] || null,
-      ratios: ratios?.[0] || null,
-      income: Array.isArray(income) ? income : [],
-      balance: Array.isArray(balance) ? balance : [],
-      cashflow: Array.isArray(cashflow) ? cashflow : [],
-      earnings: Array.isArray(earnings) ? earnings : [],
-      priceTarget: priceTarget || null,
-      priceTargetSummary: priceTargetSummary?.[0] || null,
-      analyst: Array.isArray(analyst) ? analyst : [],
-      priceChanges,
-      currentPrice,
+    // Fallback: compute ratios from raw statements if TTM ratios empty
+let computedRatios = ratios?.[0] || null
+if (!computedRatios && income?.[0] && balance?.[0]) {
+  const i = income[0]
+  const b = balance[0]
+  const cf = cashflow?.[0]
+  const price = profile?.[0]?.price
+  const shares = i.weightedAverageShsOutDil || i.weightedAverageShsOut
+  const eps = shares ? i.netIncome / shares : null
+  computedRatios = {
+    priceToEarningsRatioTTM: eps && price ? price / eps : null,
+    priceToBookRatioTTM: b.totalEquity && shares && price ? price / (b.totalEquity / shares) : null,
+    priceToFreeCashFlowRatioTTM: cf?.freeCashFlow && shares && price ? price / (cf.freeCashFlow / shares) : null,
+    priceToSalesRatioTTM: i.revenue && shares && price ? price / (i.revenue / shares) : null,
+    grossProfitMarginTTM: i.revenue ? i.grossProfit / i.revenue : null,
+    netProfitMarginTTM: i.revenue ? i.netIncome / i.revenue : null,
+    debtToEquityRatioTTM: b.totalEquity ? b.totalDebt / b.totalEquity : null,
+    currentRatioTTM: b.totalCurrentLiabilities ? b.totalCurrentAssets / b.totalCurrentLiabilities : null,
+    freeCashFlowOperatingCashFlowRatioTTM: cf?.operatingCashFlow ? cf.freeCashFlow / cf.operatingCashFlow : null,
+  }
+}
+
+res.status(200).json({
+  profile: profile?.[0] || null,
+  ratios: computedRatios,
     })
   } catch (err) {
     res.status(500).json({ error: err.message })
