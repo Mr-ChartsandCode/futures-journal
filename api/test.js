@@ -1,6 +1,5 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  
   try {
     const response = await fetch('https://feeds.reuters.com/reuters/businessNews', {
       headers: {
@@ -8,9 +7,8 @@ export default async function handler(req, res) {
         'Accept': 'application/rss+xml, application/xml, text/xml',
       }
     })
-    
     const text = await response.text()
-    res.status(200).json({ 
+    res.status(200).json({
       status: response.status,
       length: text.length,
       preview: text.slice(0, 500)

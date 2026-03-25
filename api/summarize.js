@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const { headline, summary, source, category } = req.body
@@ -13,24 +13,15 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
-        max_tokens: 300,
-        system: `You are a concise market analyst for a professional futures trader who trades ES, NQ, CL and GC. 
-                  Your job is to summarize news in exactly 3 bullet points focused purely on market impact.
-                  Format: 
-                  - [What happened]
-                  - [Direct market impact — which instruments, which direction, why]  
-                  - [What to watch — key levels, follow-on events, risks]
-                  Be direct, specific, no fluff. If the news has no clear market impact say so in one line.`,
+        max_tokens: 225,
         messages: [{
           role: 'user',
-          content: `Summarize this news for a futures trader:\n\nSource: ${source}\nCategory: ${category}\nHeadline: ${headline}\n\nArticle: ${summary || 'No article body available.'}`
+          content: `You are a market analyst for a futures trader (ES, NQ, CL, GC). Summarize in exactly 3 bullet points — what happened, market impact, what to watch. Be direct and specific. No fluff.\n\nSource: ${source}\nCategory: ${category}\nHeadline: ${headline}\nArticle: ${summary?.slice(0, 500) || 'N/A'}`
         }]
       })
     })
-
     const data = await response.json()
-    const text = data.content?.[0]?.text || 'Unable to generate summary.'
-    res.status(200).json({ summary: text })
+    res.status(200).json({ summary: data.content?.[0]?.text || 'Unable to generate summary.' })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
