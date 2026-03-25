@@ -1,7 +1,3 @@
-export const config = {
-  runtime: 'nodejs20.x',
-}
-
 const FEEDS = [
   { url: 'https://feeds.reuters.com/reuters/businessNews', label: 'Reuters Business' },
   { url: 'https://feeds.reuters.com/reuters/topNews', label: 'Reuters Top News' },
