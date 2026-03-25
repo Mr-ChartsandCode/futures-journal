@@ -29,6 +29,16 @@ function groupByDate(events) {
   return groups
 }
 
+function countryFlag(country) {
+  const flags = {
+    USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', JPY: '🇯🇵', CAD: '🇨🇦',
+    AUD: '🇦🇺', CNY: '🇨🇳', CNH: '🇨🇳', INR: '🇮🇳', BRL: '🇧🇷',
+    KRW: '🇰🇷', MXN: '🇲🇽', RUB: '🇷🇺', ZAR: '🇿🇦', TRY: '🇹🇷',
+    SAR: '🇸🇦', ARS: '🇦🇷', IDR: '🇮🇩', CHF: '🇨🇭', SGD: '🇸🇬',
+  }
+  return flags[country] || '🌐'
+}
+
 export default function EconCalendar() {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -152,8 +162,8 @@ export default function EconCalendar() {
 
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 500, color: '#ffffff', marginBottom: 3 }}>
-                        {event.title}
-                      </div>
+                      {countryFlag(event.country)} {event.title}
+                    </div>
                       <div style={{ display: 'flex', gap: 12, fontSize: 11 }}>
                         {event.forecast && (
                           <span style={{ color: '#555' }}>Forecast: <span style={{ color: '#888' }}>{event.forecast}</span></span>
