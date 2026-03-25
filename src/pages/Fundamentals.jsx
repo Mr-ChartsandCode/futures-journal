@@ -502,7 +502,7 @@ export default function Fundamentals() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 6, marginBottom: 16 }}>
-                {Object.entries(data.priceChanges).map(([period, change]) => (
+                {Object.entries(data.priceChanges || {}).map(([period, change]) => (
                   <div key={period} style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 6, padding: '8px 10px', textAlign: 'center' }}>
                     <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.06em', marginBottom: 4 }}>{period}</div>
                     <div style={{ fontSize: 15, fontWeight: 700, color: changeColor(change) }}>
