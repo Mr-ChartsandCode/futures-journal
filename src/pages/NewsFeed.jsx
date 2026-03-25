@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 
-const CATEGORIES = ['All', 'Markets', 'Geopolitical', 'Earnings']
+const CATEGORIES = ['All', 'Markets', 'Geopolitical', 'Earnings', 'Alert']
 
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime()
@@ -18,6 +18,7 @@ function categoryColor(cat) {
     case 'Markets':      return { color: '#70c0ff', bg: '#001428', border: '#003080' }
     case 'Geopolitical': return { color: '#ffaa40', bg: '#1a0e00', border: '#604000' }
     case 'Earnings':     return { color: '#a070ff', bg: '#0e0018', border: '#400080' }
+    case 'Alert':        return { color: '#ff4444', bg: '#1a0000', border: '#600000' }
     default:             return { color: '#888',    bg: '#111',    border: '#333'    }
   }
 }
@@ -30,16 +31,31 @@ export default function NewsFeed() {
   const intervalRef = useRef(null)
 
   async function fetchNews() {
-    try {
-      const res = await fetch('/api/news')
-      const data = await res.json()
-      setArticles(data.news || [])
-      setLoading(false)
-    } catch (err) {
-      setError(err.message)
-      setLoading(false)
-    }
+  try {
+    const [newsRes, alertsRes] = await Promise.all([
+      fetch('/api/news'),
+      fetch('/api/alerts')
+    ])
+    const [newsData, alertsData] = await Promise.all([
+      newsRes.json(),
+      alertsRes.json()
+    ])
+
+    const newsArticles = (newsData.news || [])
+
+    const alertArticles = (alertsData.alerts || []).map(a => ({
+      ...a,
+      isAlert: true,
+    }))
+
+    const combined = [...alertArticles, ...newsArticles]
+    setArticles(combined)
+    setLoading(false)
+  } catch (err) {
+    setError(err.message)
+    setLoading(false)
   }
+}
 
   useEffect(() => {
     fetchNews()
@@ -121,6 +137,11 @@ export default function NewsFeed() {
                     {isLive && (
                       <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         LIVE
+                      </span>
+                    )}
+                    {article.isAlert && (
+                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
+                        ⚡ ALERT
                       </span>
                     )}
                     <span style={{ fontSize: 11, color: '#666' }}>
