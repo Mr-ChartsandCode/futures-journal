@@ -54,7 +54,7 @@ export default async function handler(req, res) {
               headline: title,
               summary: description.replace(/<[^>]+>/g, '').trim(),
               source: feed.label,
-              author: 'Wire',
+              author: feed.label,
               url: link,
               created_at: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
             })

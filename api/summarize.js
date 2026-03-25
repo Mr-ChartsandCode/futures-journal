@@ -1,7 +1,9 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const { headline, summary, source, category } = req.body
+  const { headline, summary, source, category } = req.body || {}
+
+  if (!headline) return res.status(400).json({ error: 'No headline provided' })
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -20,12 +22,18 @@ export default async function handler(req, res) {
         }]
       })
     })
+
+    if (!response.ok) {
+      const err = await response.text()
+      console.error('Anthropic error:', err)
+      return res.status(200).json({ summary: null })
+    }
+
     const data = await response.json()
-    res.status(200).json({ summary: data.content?.[0]?.text || 'Unable to generate summary.' })
+    const text = data.content?.[0]?.text || null
+    res.status(200).json({ summary: text })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    console.error('Summarize error:', err.message)
+    res.status(200).json({ summary: null })
   }
 }
-
-
-

@@ -323,11 +323,6 @@ export default function NewsFeed() {
                     <h2 style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.45, marginBottom: 12, color: '#ffffff' }}>
                       {selected.headline}
                     </h2>
-                    {selected.author && (
-                      <div style={{ fontSize: 11, color: '#444', marginBottom: 12, letterSpacing: '0.03em' }}>
-                        BY {selected.author.toUpperCase()}
-                      </div>
-                    )}
                     <div style={{ width: 32, height: 1, background: '#1e1e1e', marginBottom: 14 }} />
                     <p style={{ fontSize: 13, color: '#e0e0e0', lineHeight: 1.85, marginBottom: 20 }}>
                       {selected.summary ? selected.summary.split('. ').slice(0, 3).join('. ') + '.' : 'No preview available.'}
