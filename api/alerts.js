@@ -329,6 +329,44 @@ const TRACKED_TICKERS = [
   { symbol: 'PTGX',  name: 'Protagonist Therapeutics', sector: 'Biotech', cap: 2 },
 ]
 
+async function fetchEconAlerts() {
+  try {
+    const r = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json', {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    })
+    const data = await r.json()
+    const now = new Date()
+    const oneHour = 60 * 60 * 1000
+
+    return (Array.isArray(data) ? data : [])
+      .filter(e => {
+        if (e.country !== 'USD') return false
+        if (e.impact !== 'High') return false
+        const eventTime = new Date(e.date)
+        const diff = eventTime - now
+        return diff >= -oneHour && diff <= oneHour * 2
+      })
+      .map(e => {
+        const eventTime = new Date(e.date)
+        const isFuture = eventTime > now
+        const headline = isFuture
+          ? `⚡ UPCOMING: ${e.title} — releases at ${eventTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
+          : `⚡ RELEASED: ${e.title}${e.actual ? ` — Actual: ${e.actual}` : ''}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
+        return {
+          id: `econ-${e.title}-${e.date}`,
+          headline,
+          summary: `High impact US economic event. ${e.forecast ? `Forecast: ${e.forecast}.` : ''} ${e.previous ? `Previous: ${e.previous}.` : ''} ${e.actual ? `Actual result: ${e.actual}.` : ''}`,
+          source: 'ECON ALERT',
+          category: 'Alert',
+          created_at: e.date,
+          isAlert: true,
+          alertType: 'economic',
+          changePct: 0,
+        }
+      })
+  } catch { return [] }
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Cache-Control', 's-maxage=90')
@@ -380,9 +418,14 @@ export default async function handler(req, res) {
     }
 
     // Sort movers by magnitude
-    alerts.sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct))
-
-    res.status(200).json({ alerts, count: alerts.length })
+    const econAlerts = await fetchEconAlerts()
+    const allAlerts = [...econAlerts, ...alerts]
+    allAlerts.sort((a, b) => {
+      if (a.alertType === 'economic' && b.alertType !== 'economic') return -1
+      if (b.alertType === 'economic' && a.alertType !== 'economic') return 1
+      return Math.abs(b.changePct) - Math.abs(a.changePct)
+    })
+    res.status(200).json({ alerts: allAlerts, count: allAlerts.length })
   } catch (err) {
     console.error('Alerts error:', err)
     res.status(200).json({ alerts: [], count: 0, error: err.message })
