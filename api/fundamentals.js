@@ -23,7 +23,9 @@ export default async function handler(req, res) {
       fetch(`https://financialmodelingprep.com/stable/price-target-consensus?symbol=${symbol}&apikey=${key}`),
       fetch(`https://financialmodelingprep.com/stable/price-target-summary?symbol=${symbol}&apikey=${key}`),
       fetch(`https://financialmodelingprep.com/stable/analyst-estimates?symbol=${symbol}&period=annual&apikey=${key}&limit=3`),
-      fetch(`https://financialmodelingprep.com/stable/historical-price-eod/light?symbol=${symbol}&apikey=${key}&from=2010-01-01&to=${today}`),
+      fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1mo&range=10y`, {
+  headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36' }
+}),
     ])
 
     const safeJson = async (r) => {
@@ -75,9 +77,20 @@ export default async function handler(req, res) {
       }
     }
 
-    const prices = Array.isArray(priceHistoryData)
-      ? priceHistoryData.sort((a, b) => new Date(b.date) - new Date(a.date))
-      : []
+    let prices = []
+    try {
+      const chart = priceHistoryData?.chart?.result?.[0]
+      if (chart) {
+        const timestamps = chart.timestamp || []
+        const closes = chart.indicators?.quote?.[0]?.close || []
+        prices = timestamps.map((ts, i) => ({
+          date: new Date(ts * 1000).toISOString().split('T')[0],
+          price: closes[i]
+        }))
+        .filter(p => p.price)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+      }
+    } catch {}
     const currentPrice = profile?.price || prices[0]?.price
 
     function getPriceChange(daysAgo) {
