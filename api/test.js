@@ -3,18 +3,18 @@ export default async function handler(req, res) {
 
   try {
     const ETFS = [
-      { etf: 'XLK',  name: 'Technology',             url: 'https://www.ishares.com/us/products/239726/ishares-us-technology-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLF',  name: 'Financials',             url: 'https://www.ishares.com/us/products/239763/ishares-us-financials-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLV',  name: 'Healthcare',             url: 'https://www.ishares.com/us/products/239846/ishares-us-healthcare-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLE',  name: 'Energy',                 url: 'https://www.ishares.com/us/products/239771/ishares-us-energy-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLI',  name: 'Industrials',            url: 'https://www.ishares.com/us/products/239792/ishares-us-industrials-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLY',  name: 'Consumer Discretionary', url: 'https://www.ishares.com/us/products/239731/ishares-us-consumer-discretionary-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLP',  name: 'Consumer Staples',       url: 'https://www.ishares.com/us/products/239843/ishares-us-consumer-staples-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLB',  name: 'Materials',              url: 'https://www.ishares.com/us/products/239706/ishares-us-basic-materials-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLU',  name: 'Utilities',              url: 'https://www.ishares.com/us/products/239853/ishares-us-utilities-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLC',  name: 'Communication Services', url: 'https://www.ishares.com/us/products/239740/ishares-us-telecommunications-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XLRE', name: 'Real Estate',            url: 'https://www.ishares.com/us/products/239713/ishares-us-real-estate-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
-      { etf: 'XBI',  name: 'Biotech',                url: 'https://www.ishares.com/us/products/239699/ishares-nasdaq-biotechnology-etf/1467271812596.ajax?fileType=csv&dataType=fund' },
+      { etf: 'XLK',  name: 'Technology',             url: 'https://www.sectorspdrs.com/api/fund/XLK/holdings.csv' },
+      { etf: 'XLF',  name: 'Financials',             url: 'https://www.sectorspdrs.com/api/fund/XLF/holdings.csv' },
+      { etf: 'XLV',  name: 'Healthcare',             url: 'https://www.sectorspdrs.com/api/fund/XLV/holdings.csv' },
+      { etf: 'XLE',  name: 'Energy',                 url: 'https://www.sectorspdrs.com/api/fund/XLE/holdings.csv' },
+      { etf: 'XLI',  name: 'Industrials',            url: 'https://www.sectorspdrs.com/api/fund/XLI/holdings.csv' },
+      { etf: 'XLY',  name: 'Consumer Discretionary', url: 'https://www.sectorspdrs.com/api/fund/XLY/holdings.csv' },
+      { etf: 'XLP',  name: 'Consumer Staples',       url: 'https://www.sectorspdrs.com/api/fund/XLP/holdings.csv' },
+      { etf: 'XLB',  name: 'Materials',              url: 'https://www.sectorspdrs.com/api/fund/XLB/holdings.csv' },
+      { etf: 'XLU',  name: 'Utilities',              url: 'https://www.sectorspdrs.com/api/fund/XLU/holdings.csv' },
+      { etf: 'XLC',  name: 'Communication Services', url: 'https://www.sectorspdrs.com/api/fund/XLC/holdings.csv' },
+      { etf: 'XLRE', name: 'Real Estate',            url: 'https://www.sectorspdrs.com/api/fund/XLRE/holdings.csv' },
+      { etf: 'XBI',  name: 'Biotech',                url: 'https://www.ssga.com/us/en/intermediary/etfs/funds/spdr-sp-biotech-etf-xbi/IQ3X5Z.csv' },
     ]
 
     const results = await Promise.allSettled(
@@ -24,8 +24,8 @@ export default async function handler(req, res) {
           signal: AbortSignal.timeout(8000),
         })
         const text = await r.text()
-        const isCSV = text.includes('Ticker') || text.includes('ticker')
-        return { etf, name, status: r.status, length: text.length, isCSV, preview: text.slice(0, 100) }
+        const isCSV = text.includes('Ticker') || text.includes('Symbol') || text.includes('ticker')
+        return { etf, name, status: r.status, length: text.length, isCSV, preview: text.slice(0, 150) }
       })
     )
 
