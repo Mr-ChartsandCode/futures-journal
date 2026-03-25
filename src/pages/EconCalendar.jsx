@@ -29,14 +29,22 @@ function groupByDate(events) {
   return groups
 }
 
-function countryFlag(country) {
-  const flags = {
-    USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', JPY: '🇯🇵', CAD: '🇨🇦',
-    AUD: '🇦🇺', CNY: '🇨🇳', CNH: '🇨🇳', INR: '🇮🇳', BRL: '🇧🇷',
-    KRW: '🇰🇷', MXN: '🇲🇽', RUB: '🇷🇺', ZAR: '🇿🇦', TRY: '🇹🇷',
-    SAR: '🇸🇦', ARS: '🇦🇷', IDR: '🇮🇩', CHF: '🇨🇭', SGD: '🇸🇬',
+function countryBadge(country) {
+  const colors = {
+    USD: '#70c0ff', EUR: '#a0d0ff', GBP: '#80b8ff',
+    JPY: '#ffaa40', CAD: '#ff8844', AUD: '#ffcc44',
+    CNY: '#ff6060', CNH: '#ff6060', INR: '#ff9944',
+    BRL: '#44cc88', KRW: '#44aaff', MXN: '#88dd44',
+    CHF: '#ff4444', SGD: '#44ddaa',
   }
-  return flags[country] || '🌐'
+  const color = colors[country] || '#888'
+  return (
+    <span style={{
+      fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 3,
+      background: `${color}22`, color, border: `1px solid ${color}44`,
+      letterSpacing: '0.06em', marginRight: 6, flexShrink: 0,
+    }}>{country}</span>
+  )
 }
 
 export default function EconCalendar() {
@@ -161,8 +169,8 @@ export default function EconCalendar() {
                     <div style={{ width: 4, height: 28, borderRadius: 2, background: color, flexShrink: 0 }} />
 
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: '#ffffff', marginBottom: 3 }}>
-                      {countryFlag(event.country)} {event.title}
+                      <div style={{ fontSize: 14, fontWeight: 500, color: '#ffffff', marginBottom: 3, display: 'flex', alignItems: 'center' }}>
+                      {countryBadge(event.country)}{event.title}
                     </div>
                       <div style={{ display: 'flex', gap: 12, fontSize: 11 }}>
                         {event.forecast && (
