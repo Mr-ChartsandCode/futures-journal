@@ -15,7 +15,6 @@ const NAV = [
     items: [
       { label: 'Sector Heatmap', icon: '▦', path: '/sectors' },
       { label: 'Stock Movers', icon: '▣', path: '/movers' },
-      { label: 'Fundamentals', icon: '◉', path: '/fundamentals' },
       { label: 'Econ Calendar', icon: '◷', path: '/calendar' },
     ]
   },

@@ -9,7 +9,6 @@ import EditTrade from './pages/EditTrade'
 import Analytics from './pages/Analytics'
 import SectorHeatmap from './pages/SectorHeatmap'
 import StockMovers from './pages/StockMovers'
-import Fundamentals from './pages/Fundamentals'
 import EconCalendar from './pages/EconCalendar'
 import NewsFeed from './pages/NewsFeed'
 import AIAssistant from './pages/AIAssistant'
@@ -71,7 +70,6 @@ export default function App() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/sectors" element={<SectorHeatmap />} />
           <Route path="/movers" element={<StockMovers />} />
-          <Route path="/fundamentals" element={<Fundamentals />} />
           <Route path="/calendar" element={<EconCalendar />} />
           <Route path="/news" element={<NewsFeed />} />
           <Route path="/ai" element={<AIAssistant />} />
