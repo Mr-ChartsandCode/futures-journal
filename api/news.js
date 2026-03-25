@@ -195,9 +195,12 @@ export default async function handler(req, res) {
     if (result.status === 'fulfilled') allItems.push(...result.value)
   }
 
+  const ytdStart = new Date(new Date().getFullYear(), 0, 1).getTime()
+
   const seen = new Set()
   const deduped = allItems.filter(a => {
     if (!a.headline || seen.has(a.headline)) return false
+    if (new Date(a.created_at).getTime() < ytdStart) return false
     seen.add(a.headline)
     return true
   })
