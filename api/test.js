@@ -2,31 +2,12 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
 
   try {
-    const sectors = [
-      { symbol: 'XLK', name: 'Technology' },
-      { symbol: 'XLE', name: 'Energy' },
-    ]
-
-    const results = await Promise.all(
-      sectors.map(async s => {
-        const r = await fetch(
-          `https://query1.finance.yahoo.com/v8/finance/chart/${s.symbol}?interval=1d&range=1d`,
-          { headers: { 'User-Agent': 'Mozilla/5.0' } }
-        )
-        const data = await r.json()
-        const meta = data.chart?.result?.[0]?.meta
-        return {
-          symbol: s.symbol,
-          name: s.name,
-          status: r.status,
-          price: meta?.regularMarketPrice,
-          prevClose: meta?.chartPreviousClose,
-          change: meta ? ((meta.regularMarketPrice - meta.chartPreviousClose) / meta.chartPreviousClose * 100).toFixed(2) : null
-        }
-      })
+    const r = await fetch(
+      'https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&scrIds=day_gainers&count=5',
+      { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36' } }
     )
-
-    res.status(200).json(results)
+    const data = await r.json()
+    res.status(200).json({ status: r.status, sample: data?.finance?.result?.[0]?.quotes?.slice(0, 3) })
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
