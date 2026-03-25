@@ -595,7 +595,7 @@ export default function Fundamentals() {
 
                     <div style={CARD}>
                       <div style={LABEL}>Earnings</div>
-                      {data.earnings.slice(0, 5).map((e, i) => (
+                      {(data.earnings || []).slice(0, 5).map((e, i) => (
                         <div key={i} style={ROW}>
                           <span style={KEY}>{e.date}</span>
                           <div style={{ textAlign: 'right' }}>
@@ -617,7 +617,7 @@ export default function Fundamentals() {
                       <thead>
                         <tr style={{ borderBottom: '1px solid #222' }}>
                           <th style={{ padding: '8px', textAlign: 'left', color: '#555', fontWeight: 600, fontSize: 11 }}>Metric</th>
-                          {data.income.map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 7)}</th>)}
+                          {(data.income || []).map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 7)}</th>)}
                         </tr>
                       </thead>
                       <tbody>
@@ -632,7 +632,7 @@ export default function Fundamentals() {
                         ].map(([label, key]) => (
                           <tr key={key} style={{ borderBottom: '1px solid #111' }}>
                             <td style={{ padding: '7px 8px', color: '#888' }}>{label}</td>
-                            {data.income.map(q => (
+                            {(data.income || []).map(q => (
                               <td key={q.date} style={{ padding: '7px 8px', textAlign: 'right', color: '#e0e0e0' }}>
                                 {key === 'eps' || key === 'epsDiluted' ? `$${q[key]?.toFixed(2)}` : fmt(q[key])}
                               </td>
@@ -653,7 +653,7 @@ export default function Fundamentals() {
                       <thead>
                         <tr style={{ borderBottom: '1px solid #222' }}>
                           <th style={{ padding: '8px', textAlign: 'left', color: '#555', fontWeight: 600, fontSize: 11 }}>Metric</th>
-                          {data.balance.map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 7)}</th>)}
+                          {(data.balance || []).map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 7)}</th>)}
                         </tr>
                       </thead>
                       <tbody>
@@ -667,7 +667,7 @@ export default function Fundamentals() {
                         ].map(([label, key]) => (
                           <tr key={key} style={{ borderBottom: '1px solid #111' }}>
                             <td style={{ padding: '7px 8px', color: '#888' }}>{label}</td>
-                            {data.balance.map(q => (
+                            {(data.balance || []).map(q => (
                               <td key={q.date} style={{ padding: '7px 8px', textAlign: 'right', color: '#e0e0e0' }}>
                                 {fmt(q[key])}
                               </td>
@@ -688,7 +688,7 @@ export default function Fundamentals() {
                       <thead>
                         <tr style={{ borderBottom: '1px solid #222' }}>
                           <th style={{ padding: '8px', textAlign: 'left', color: '#555', fontWeight: 600, fontSize: 11 }}>Metric</th>
-                          {data.cashflow.map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 7)}</th>)}
+                          {(data.cashflow || []).map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 7)}</th>)}
                         </tr>
                       </thead>
                       <tbody>
@@ -703,8 +703,8 @@ export default function Fundamentals() {
                         ].map(([label, key]) => (
                           <tr key={key} style={{ borderBottom: '1px solid #111' }}>
                             <td style={{ padding: '7px 8px', color: '#888' }}>{label}</td>
-                            {data.cashflow.map(q => (
-                              <td key={q.date} style={{ padding: '7px 8px', textAlign: 'right', color: q[key] < 0 ? '#ff6060' : '#e0e0e0' }}>
+                            {(data.cashflow || []).map(q => (
+                                <td key={q.date} style={{ padding: '7px 8px', textAlign: 'right', color: q[key] < 0 ? '#ff6060' : '#e0e0e0' }}>
                                 {fmt(q[key])}
                               </td>
                             ))}
@@ -724,7 +724,7 @@ export default function Fundamentals() {
                       <thead>
                         <tr style={{ borderBottom: '1px solid #222' }}>
                           <th style={{ padding: '8px', textAlign: 'left', color: '#555', fontWeight: 600, fontSize: 11 }}>Metric</th>
-                          {data.analyst.map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 4)}</th>)}
+                          {(data.analyst || []).map(q => <th key={q.date} style={{ padding: '8px', textAlign: 'right', color: '#555', fontWeight: 600, fontSize: 11 }}>{q.date?.slice(0, 4)}</th>)}
                         </tr>
                       </thead>
                       <tbody>
@@ -741,7 +741,7 @@ export default function Fundamentals() {
                         ].map(([label, key]) => (
                           <tr key={key} style={{ borderBottom: '1px solid #111' }}>
                             <td style={{ padding: '7px 8px', color: '#888' }}>{label}</td>
-                            {data.analyst.map(q => (
+                            {(data.analyst || []).map(q => (
                               <td key={q.date} style={{ padding: '7px 8px', textAlign: 'right', color: '#e0e0e0' }}>
                                 {key.startsWith('eps') || key === 'numAnalystsEps'
                                   ? key === 'numAnalystsEps' ? q[key] : `$${q[key]?.toFixed(2)}`
