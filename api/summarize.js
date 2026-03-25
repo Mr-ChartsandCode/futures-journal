@@ -1,4 +1,4 @@
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const { headline, summary, source, category } = req.body
@@ -26,3 +26,6 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: err.message })
   }
 }
+
+
+

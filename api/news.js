@@ -1,3 +1,7 @@
+export const config = {
+  runtime: 'nodejs20.x',
+}
+
 const FEEDS = [
   { url: 'https://feeds.reuters.com/reuters/businessNews', label: 'Reuters Business' },
   { url: 'https://feeds.reuters.com/reuters/topNews', label: 'Reuters Top News' },
@@ -5,24 +9,23 @@ const FEEDS = [
   { url: 'https://feeds.reuters.com/reuters/USNewsHeadlines', label: 'Reuters US' },
 ]
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Cache-Control', 's-maxage=60')
 
   try {
     const results = await Promise.allSettled(
       FEEDS.map(async feed => {
         const r = await fetch(feed.url, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; NewsReader/1.0)',
-            'Accept': 'application/rss+xml, application/xml, text/xml',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
           }
         })
         const xml = await r.text()
         console.log(`${feed.label} status:`, r.status, 'length:', xml.length)
 
         const items = []
-        const itemMatches = xml.matchAll(/<item>([\s\S]*?)<\/item>/g)
+        const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
         for (const match of itemMatches) {
           const block = match[1]
           const get = (tag) => {
@@ -31,7 +34,7 @@ module.exports = async function handler(req, res) {
           }
           const title = get('title')
           const description = get('description')
-          const link = block.match(/<link>\s*(.*?)\s*<\/link>/)?.[1] || get('link')
+          const link = block.match(/<link>\s*(.*?)\s*<\/link>/)?.[1] || ''
           const pubDate = get('pubDate')
           const guid = get('guid') || link
 
@@ -42,12 +45,11 @@ module.exports = async function handler(req, res) {
               summary: description.replace(/<[^>]+>/g, '').trim(),
               source: feed.label,
               author: 'Reuters',
-              url: link?.trim(),
+              url: link.trim(),
               created_at: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
             })
           }
         }
-        console.log(`${feed.label}: ${items.length} items`)
         return items
       })
     )
@@ -55,7 +57,6 @@ module.exports = async function handler(req, res) {
     const allItems = []
     for (const result of results) {
       if (result.status === 'fulfilled') allItems.push(...result.value)
-      else console.log('Feed failed:', result.reason)
     }
 
     const seen = new Set()
@@ -66,10 +67,9 @@ module.exports = async function handler(req, res) {
     })
 
     deduped.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    console.log('Total items:', deduped.length)
     res.status(200).json({ news: deduped, count: deduped.length })
   } catch (err) {
     console.error('Error:', err)
-    res.status(500).json({ error: err.message })
+    res.status(500).json({ error: err.message, stack: err.stack })
   }
 }
