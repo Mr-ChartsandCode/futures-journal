@@ -5,6 +5,8 @@ const FEEDS = [
   { url: 'https://news.google.com/rss/search?q=federal+reserve+OR+inflation+OR+oil+price+OR+war+OR+sanctions+OR+earnings+OR+GDP+OR+interest+rates+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google News' },
   { url: 'https://news.google.com/rss/search?q=S%26P500+OR+nasdaq+OR+dow+jones+OR+treasury+yields+OR+crude+oil+OR+OPEC+OR+gold+price+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Markets' },
   { url: 'https://news.google.com/rss/search?q=china+economy+OR+russia+sanctions+OR+iran+OR+ukraine+war+OR+trump+tariff+OR+geopolitical+risk+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Geo' },
+  { url: 'https://news.google.com/rss/search?q=federal+reserve+chair+OR+treasury+secretary+OR+white+house+policy+OR+congress+bill+OR+executive+order+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Policy' },
+  { url: 'https://news.google.com/rss/search?q=fed+chair+OR+press+secretary+OR+senate+vote+OR+house+vote+OR+new+regulation+OR+deregulation+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Politics' },
 ]
 
 const JUNK_PHRASES = [
@@ -69,7 +71,25 @@ const ALWAYS_PASS = [
   'artificial intelligence','cybersecurity',
   'united states','united kingdom','europe','european union',
   'sterling','pound','swiss franc','yen','euro',
-  'terrorist','extremist','regime',
+  'terrorist','extremist','regime', 'federal budget','debt ceiling','continuing resolution','fiscal policy',
+  'treasury secretary','fed chair','federal chairman','jerome powell',
+  'scott bessent','janet yellen',
+  'press secretary','press briefing','white house briefing',
+  'executive order','signed into law','passed the senate','passed the house',
+  'senate vote','house vote','filibuster','budget reconciliation',
+  'trade representative','commerce secretary','treasury department',
+  'department of energy','department of defense','pentagon',
+  'new bill','new legislation','new law','new regulation','new policy',
+  'deregulation','regulatory rollback','regulatory change',
+  'epa','sec ruling','sec enforcement','doj','department of justice',
+  'antitrust','monopoly','price fixing',
+  'national security','defense spending','military budget',
+  'strategic petroleum reserve','spr release','spr refill',
+  'sovereign wealth fund','national debt','deficit spending',
+  'tax cut','tax hike','tax reform','corporate tax',
+  'minimum wage','labor market','unemployment rate',
+  'immigration policy','border policy',
+  'marco rubio','scott bessent','howard lutnick','doug burgum'
 ]
 
 function isJunk(headline) {

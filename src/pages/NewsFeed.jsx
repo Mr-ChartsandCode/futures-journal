@@ -12,7 +12,7 @@ const JUNK_PHRASES = [
   'how to invest', 'how to trade', 'for beginners',
   'what you need to know', 'everything you need',
   'better buy', 'which is better',
-  'crypto', 'bitcoin', 'ethereum', 'nft', 'defi', 'dogecoin',
+  'crypto', 'bitcoin', 'ethereum', 'nft', 'defi', 'dogecoin'
 ]
 
 const EARNINGS_JUNK = [
