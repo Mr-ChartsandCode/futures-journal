@@ -127,7 +127,7 @@ export default function Dashboard() {
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 16px' }}>
 
-      <div className="topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 12, paddingBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--blue-hi)', letterSpacing: '0.1em', textTransform: 'uppercase', textShadow: '0 0 20px rgba(0,132,255,0.5)' }}>
           FuturesJournal
         </span>

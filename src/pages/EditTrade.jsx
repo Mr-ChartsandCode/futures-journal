@@ -158,7 +158,7 @@ export default function EditTrade() {
 
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '12px 16px' }}>
-      <div className="topbar" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ borderBottom: '1px solid var(--border)', marginBottom: 12, paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={() => navigate(`/trade/${id}`)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 16, padding: 0 }}>←</button>
         <span style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>Edit Trade</span>
       </div>
