@@ -89,41 +89,36 @@ export default function SectorHeatmap() {
           ERROR: {error}
         </div>
       ) : (
-        <div style={{ flex: 1, padding: 20, overflowY: 'auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 10, marginBottom: 20 }}>
+        <div style={{ flex: 1, padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8, overflow: 'hidden' }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gridTemplateRows: 'repeat(3, 1fr)', gap: 8 }}>
             {sorted.map(sector => {
               const { bg, color, border } = heatColor(sector.change)
-              const abs = Math.abs(parseFloat(sector.change || 0))
-              const intensity = maxAbs > 0 ? abs / maxAbs : 0
-              const size = 80 + intensity * 60
               return (
                 <div key={sector.symbol} style={{
                   background: bg,
                   border: `1px solid ${border}`,
-                  borderRadius: 10,
-                  padding: `${size * 0.18}px 16px`,
+                  borderRadius: 12,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 6,
-                  boxShadow: parseFloat(sector.change || 0) !== 0 ? `0 0 20px ${border}66` : 'none',
+                  gap: 8,
+                  boxShadow: parseFloat(sector.change || 0) !== 0 ? `0 0 24px ${border}88` : 'none',
                   transition: 'all 0.3s',
-                  minHeight: `${size}px`,
                 }}>
-                  <div style={{ fontSize: 11, color: '#666', letterSpacing: '0.06em', fontWeight: 600 }}>
+                  <div style={{ fontSize: 14, color: '#555', letterSpacing: '0.08em', fontWeight: 600 }}>
                     {sector.symbol}
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#e0e0e0', textAlign: 'center' }}>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: '#e0e0e0', textAlign: 'center' }}>
                     {sector.name}
                   </div>
-                  <div style={{ fontSize: 22, fontWeight: 700, color, letterSpacing: '-0.02em' }}>
+                  <div style={{ fontSize: 32, fontWeight: 700, color, letterSpacing: '-0.02em' }}>
                     {sector.change !== null
                       ? `${parseFloat(sector.change) >= 0 ? '+' : ''}${sector.change}%`
                       : '—'}
                   </div>
                   {sector.price && (
-                    <div style={{ fontSize: 11, color: '#555' }}>
+                    <div style={{ fontSize: 14, color: '#555' }}>
                       ${sector.price}
                     </div>
                   )}
@@ -132,14 +127,14 @@ export default function SectorHeatmap() {
             })}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginTop: 8 }}>
-            <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.05em' }}>SCALE:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', flexShrink: 0 }}>
+            <span style={{ fontSize: 11, color: '#444', letterSpacing: '0.05em' }}>SCALE:</span>
             {['-3%+', '-1.5%', '-0.5%', '0%', '+0.5%', '+1.5%', '+3%+'].map((label, i) => {
-              const colors = ['#ff6060','#e05050','#c04040','#444','#2060a0','#4a90d9','#70c0ff']
+              const colors = ['#ff6060','#e05050','#c04040','#333','#2060a0','#4a90d9','#70c0ff']
               return (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: 2, background: colors[i] }} />
-                  <span style={{ fontSize: 9, color: '#444' }}>{label}</span>
+                  <div style={{ width: 12, height: 12, borderRadius: 2, background: colors[i] }} />
+                  <span style={{ fontSize: 11, color: '#444' }}>{label}</span>
                 </div>
               )
             })}
