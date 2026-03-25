@@ -135,18 +135,6 @@ export default function NewsFeed() {
       const data = await res.json()
 
       const processed = (data.news || [])
-        .filter(a => a.headline && !isJunk(a.headline))
-        .filter(a => isRelevant(a))
-        .map(a => ({
-          ...a,
-          category: categorize(a.headline + ' ' + (a.summary || '')),
-        }))
-        .filter(a => {
-          if (a.category === 'Earnings') {
-            return !EARNINGS_JUNK.some(p => a.headline.toLowerCase().includes(p))
-          }
-          return true
-        })
 
       setArticles(processed)
       if (processed.length > 0 && !selected) selectArticle(processed[0])
