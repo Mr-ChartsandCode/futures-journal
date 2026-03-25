@@ -2,13 +2,36 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
 
   try {
-    const r = await fetch(
-      'https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=false&scrIds=day_gainers&count=100',
-      { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36' } }
+    const symbol = req.query.symbol || 'AAPL'
+    const key = process.env.FMP_API_KEY
+
+    const endpoints = [
+      `https://financialmodelingprep.com/stable/profile?symbol=${symbol}&apikey=${key}`,
+      `https://financialmodelingprep.com/stable/ratios-ttm?symbol=${symbol}&apikey=${key}`,
+      `https://financialmodelingprep.com/stable/income-statement?symbol=${symbol}&apikey=${key}&limit=4`,
+      `https://financialmodelingprep.com/stable/balance-sheet-statement?symbol=${symbol}&apikey=${key}&limit=4`,
+      `https://financialmodelingprep.com/stable/cash-flow-statement?symbol=${symbol}&apikey=${key}&limit=4`,
+      `https://financialmodelingprep.com/stable/earnings-surprises?symbol=${symbol}&apikey=${key}`,
+      `https://financialmodelingprep.com/stable/analyst-estimates?symbol=${symbol}&apikey=${key}&limit=4`,
+    ]
+
+    const results = await Promise.allSettled(
+      endpoints.map(async url => {
+        const r = await fetch(url, {
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        })
+        const data = await r.json()
+        const endpoint = url.split('/stable/')[1].split('?')[0]
+        return {
+          endpoint,
+          status: r.status,
+          hasData: Array.isArray(data) ? data.length > 0 : !!data,
+          sample: Array.isArray(data) ? data[0] : data
+        }
+      })
     )
-    const data = await r.json()
-    const quotes = data?.finance?.result?.[0]?.quotes || []
-    res.status(200).json({ count: quotes.length, sample: quotes.slice(0, 3).map(q => ({ symbol: q.symbol, name: q.shortName, cap: q.marketCap })) })
+
+    res.status(200).json(results.map(r => r.status === 'fulfilled' ? r.value : { error: r.reason?.message }))
   } catch (err) {
     res.status(500).json({ error: err.message })
   }
