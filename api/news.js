@@ -89,7 +89,12 @@ const ALWAYS_PASS = [
   'tax cut','tax hike','tax reform','corporate tax',
   'minimum wage','labor market','unemployment rate',
   'immigration policy','border policy',
-  'marco rubio','scott bessent','howard lutnick','doug burgum'
+  'marco rubio','scott bessent','howard lutnick','doug burgum',
+  'added to the s&p','s&p 500 addition','s&p 500 removal','removed from the s&p','joins the s&p',
+  'added to s&p 500','dropped from s&p','index rebalance','index reconstitution','index addition',
+  'index removal','nasdaq 100 addition','nasdaq 100 removal','dow jones addition','dow jones removal','replaces',
+  'added to the dow','removed from the dow','index change','index membership','constituent change','etf rebalance',
+  's&p reshuffle','russell rebalance','index inclusion','index exclusion',
 ]
 
 function isJunk(headline) {
