@@ -198,7 +198,7 @@ export default function NewsFeed() {
       <div style={{ borderBottom: '1px solid var(--border)', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(180deg,#0f0f0f,#000)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#f0f0f0' }}>
-            Reuters Wire
+            News Wire
           </span>
           <div style={{ display: 'flex', gap: 4 }}>
             {CATEGORIES.map(cat => {
@@ -218,7 +218,7 @@ export default function NewsFeed() {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 10, color: '#555', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: 10, color: '#888', letterSpacing: '0.05em' }}>
             {filtered.length} STORIES · 90s REFRESH
           </span>
           <button onClick={fetchNews} style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
@@ -240,7 +240,7 @@ export default function NewsFeed() {
 
           <div style={{ borderRight: '1px solid var(--border)', overflowY: 'auto' }}>
             {filtered.length === 0 && (
-              <div style={{ padding: 24, color: '#555', fontSize: 12, textAlign: 'center', letterSpacing: '0.05em' }}>
+              <div style={{ padding: 24, color: '#888', fontSize: 12, textAlign: 'center', letterSpacing: '0.05em' }}>
                 NO STORIES IN THIS CATEGORY
               </div>
             )}
@@ -266,11 +266,11 @@ export default function NewsFeed() {
                         LIVE
                       </span>
                     )}
-                    <span style={{ fontSize: 11, color: '#555', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: 11, color: '#888', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {article.source?.toUpperCase()} · {timeAgo(article.created_at)}
                     </span>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: isSelected ? 600 : 400, lineHeight: 1.5, color: isSelected ? '#ffffff' : '#cccccc' }}>
+                  <div style={{ fontSize: 14, fontWeight: isSelected ? 600 : 400, lineHeight: 1.5, color: isSelected ? '#ffffff' : '#e8e8e8' }}>
                     {article.headline}
                   </div>
                 </div>
@@ -329,8 +329,8 @@ export default function NewsFeed() {
                       </div>
                     )}
                     <div style={{ width: 32, height: 1, background: '#1e1e1e', marginBottom: 14 }} />
-                    <p style={{ fontSize: 13, color: '#bbbbbb', lineHeight: 1.85, marginBottom: 20 }}>
-                      {selected.summary || 'No article body available. Click below to read the full article.'}
+                    <p style={{ fontSize: 13, color: '#e0e0e0', lineHeight: 1.85, marginBottom: 20 }}>
+                      {selected.summary ? selected.summary.split('. ').slice(0, 3).join('. ') + '.' : 'No preview available.'}
                     </p>
                     {selected.url && (
                       <a href={selected.url} target="_blank" rel="noopener noreferrer" style={{
