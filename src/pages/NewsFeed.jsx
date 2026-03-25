@@ -125,8 +125,6 @@ export default function NewsFeed() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState(null)
-  const [aiSummary, setAiSummary] = useState(null)
-  const [aiLoading, setAiLoading] = useState(false)
   const [category, setCategory] = useState('All')
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
@@ -159,28 +157,9 @@ export default function NewsFeed() {
     }
   }
 
-  async function selectArticle(article) {
-    setSelected(article)
-    setAiSummary(null)
-    setAiLoading(true)
-    try {
-      const res = await fetch('/api/summarize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          headline: article.headline,
-          summary: article.summary,
-          source: article.source,
-          category: article.category,
-        })
-      })
-      const data = await res.json()
-      setAiSummary(data.summary || null)
-    } catch {
-      setAiSummary(null)
-    }
-    setAiLoading(false)
-  }
+  function selectArticle(article) {
+  setSelected(article)
+}
 
   useEffect(() => {
     fetchNews()
@@ -283,42 +262,6 @@ export default function NewsFeed() {
               const { color, bg, border } = categoryColor(selected.category)
               return (
                 <>
-                  <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', background: '#080808', flexShrink: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: bg, color, border: `1px solid ${border}`, letterSpacing: '0.06em' }}>
-                        {selected.category.toUpperCase()}
-                      </span>
-                      <span style={{ fontSize: 11, color: '#666' }}>
-                        {selected.source?.toUpperCase()} · {timeAgo(selected.created_at)}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--blue-text)', letterSpacing: '0.08em' }}>◬ AI MARKET IMPACT</span>
-                      {aiLoading && <span style={{ fontSize: 10, color: '#444', letterSpacing: '0.05em' }}>ANALYZING...</span>}
-                    </div>
-
-                    {aiLoading ? (
-                      <div style={{ display: 'flex', gap: 4, alignItems: 'center', padding: '4px 0' }}>
-                        {[0,1,2].map(i => (
-                          <div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--blue)', opacity: 0.4 }}>
-                            <style>{`@keyframes pulse{0%,100%{opacity:0.2}50%{opacity:1}}`}</style>
-                          </div>
-                        ))}
-                      </div>
-                    ) : aiSummary ? (
-                      <div style={{ fontSize: 13, lineHeight: 1.8 }}>
-                        {aiSummary.split('\n').filter(Boolean).map((line, i) => (
-                          <div key={i} style={{ marginBottom: 6, color: line.startsWith('•') ? '#e0e0e0' : '#999' }}>
-                            {line}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div style={{ fontSize: 12, color: '#444' }}>No summary available.</div>
-                    )}
-                  </div>
-
                   <div style={{ padding: '16px 20px', flex: 1 }}>
                     <h2 style={{ fontSize: 16, fontWeight: 700, lineHeight: 1.45, marginBottom: 12, color: '#ffffff' }}>
                       {selected.headline}
