@@ -162,30 +162,30 @@ export default function EconCalendar() {
                     background: isPast ? '#050505' : 'transparent',
                     opacity: isPast ? 0.6 : 1,
                   }}>
-                    <span style={{ fontSize: 11, color: '#555', letterSpacing: '0.03em' }}>
+                    <span style={{ fontSize: 16, color: '#555', letterSpacing: '0.03em' }}>
                       {formatTime(event.date)}
                     </span>
 
                     <div style={{ width: 4, height: 28, borderRadius: 2, background: color, flexShrink: 0 }} />
 
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: '#ffffff', marginBottom: 3, display: 'flex', alignItems: 'center' }}>
+                      <div style={{ fontSize: 18, fontWeight: 500, color: '#ffffff', marginBottom: 3, display: 'flex', alignItems: 'center' }}>
                       {countryBadge(event.country)}{event.title}
                     </div>
                       <div style={{ display: 'flex', gap: 12, fontSize: 11 }}>
                         {event.forecast && (
-                          <span style={{ color: '#555' }}>Forecast: <span style={{ color: '#888' }}>{event.forecast}</span></span>
+                          <span style={{ color: '#555', fontSize: 14 }}>Forecast: <span style={{ color: '#888' }}>{event.forecast}</span></span>
                         )}
                         {event.previous && (
-                          <span style={{ color: '#555' }}>Previous: <span style={{ color: '#888' }}>{event.previous}</span></span>
+                          <span style={{ color: '#555', fontSize: 14 }}>Previous: <span style={{ color: '#888' }}>{event.previous}</span></span>
                         )}
                         {event.actual && (
-                          <span style={{ color: '#555' }}>Actual: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{event.actual}</span></span>
+                          <span style={{ color: '#555', fontSize: 14 }}>Actual: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{event.actual}</span></span>
                         )}
                       </div>
                     </div>
 
-                    <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: bg, color, border: `1px solid ${border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: bg, color, border: `1px solid ${border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
                       {event.impact?.toUpperCase()}
                     </span>
                   </div>
