@@ -204,16 +204,16 @@ export default function Dashboard() {
           ))}
           {stats.bestSetup && (
             <div className="stat-card">
-              <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Best · Worst Setup</div>
+              <div style={{ fontSize: 14, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Best · Worst Setup</div>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#70c0ff', marginBottom: 2 }}>{stats.bestSetup[0]}</div>
-                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmt(stats.bestSetup[1].pnl)} · {Math.round(stats.bestSetup[1].wins/stats.bestSetup[1].trades*100)}%</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#70c0ff', marginBottom: 2 }}>{stats.bestSetup[0]}</div>
+                  <div style={{ fontSize: 13, color: 'var(--muted)' }}>{fmt(stats.bestSetup[1].pnl)} · {Math.round(stats.bestSetup[1].wins/stats.bestSetup[1].trades*100)}%</div>
                 </div>
                 {stats.worstSetup && stats.worstSetup[0] !== stats.bestSetup[0] && (
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#ff6060', marginBottom: 2 }}>{stats.worstSetup[0]}</div>
-                    <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmt(stats.worstSetup[1].pnl)} · {Math.round(stats.worstSetup[1].wins/stats.worstSetup[1].trades*100)}%</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: '#ff6060', marginBottom: 2 }}>{stats.worstSetup[0]}</div>
+                    <div style={{ fontSize: 13, color: 'var(--muted)' }}>{fmt(stats.worstSetup[1].pnl)} · {Math.round(stats.worstSetup[1].wins/stats.worstSetup[1].trades*100)}%</div>
                   </div>
                 )}
               </div>
