@@ -146,7 +146,6 @@ export default function EconCalendar() {
                 </span>
                 <span style={{ fontSize: 15, color: '#616161' }}>{dayEvents.length} EVENTS</span>
               </div>
-
               {dayEvents.map((event, i) => {
                 const { color, bg, border } = impactColor(event.impact)
                 const isPast = new Date(event.date) < new Date() && event.actual
@@ -164,9 +163,7 @@ export default function EconCalendar() {
                     <span style={{ fontSize: 16, color: '#555', letterSpacing: '0.03em' }}>
                       {formatTime(event.date)}
                     </span>
-
                     <div style={{ width: 4, height: 28, borderRadius: 2, background: color, flexShrink: 0 }} />
-
                     <div>
                       <div style={{ fontSize: 22, fontWeight: 500, color: '#ffffff', marginBottom: 3, display: 'flex', alignItems: 'center' }}>
                       {countryBadge(event.country)}{event.title}
@@ -178,16 +175,8 @@ export default function EconCalendar() {
                         {event.previous && (
                           <span style={{ color: '#555', fontSize: 14 }}>Previous: <span style={{ color: '#888' }}>{event.previous}</span></span>
                         )}
-
                       </div>
                     </div>
-
-
-                    {event.actual && (
-                      <span style={{ fontSize: 15, fontWeight: 700, color: '#70c0ff', letterSpacing: '0.04em', flexShrink: 0, minWidth: 60, textAlign: 'right' }}>
-                        {event.actual}
-                      </span>
-                    )}
                   </div>
                 )
               })}

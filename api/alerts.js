@@ -338,14 +338,19 @@ async function fetchEconAlerts() {
     const now = new Date()
     const oneHour = 60 * 60 * 1000
 
-    return (Array.isArray(data) ? data : [])
-      .filter(e => {
-        if (e.country !== 'USD') return false
-        if (e.impact !== 'High') return false
-        const eventTime = new Date(e.date)
-        const diff = eventTime - now
-        return diff >= -oneHour && diff <= oneHour * 2
-      })
+    const G20_CURRENCIES = new Set([
+  'USD','EUR','GBP','JPY','CAD','AUD','CNY','CNH','INR','BRL',
+  'KRW','MXN','RUB','ZAR','TRY','SAR','ARS','IDR','CHF','SGD'
+])
+
+return (Array.isArray(data) ? data : [])
+  .filter(e => {
+    if (!G20_CURRENCIES.has(e.country)) return false
+    if (e.impact !== 'High' && e.impact !== 'Medium') return false
+    const eventTime = new Date(e.date)
+    const diff = eventTime - now
+    return diff >= -oneHour && diff <= oneHour * 8
+  })
       .map(e => {
         const eventTime = new Date(e.date)
         const isFuture = eventTime > now
