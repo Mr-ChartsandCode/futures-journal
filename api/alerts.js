@@ -356,7 +356,8 @@ return (Array.isArray(data) ? data : [])
   if (!G20_CURRENCIES.has(e.country)) return false
   if (e.impact !== 'High' && e.impact !== 'Medium') return false
   const eventTime = new Date(e.date)
-  return eventTime <= now && now <= marketClose && now >= marketOpen
+  const isToday = eventTime.toDateString() === now.toDateString()
+  return isToday && eventTime <= now && now <= marketClose
 })
       .map(e => {
         const eventTime = new Date(e.date)

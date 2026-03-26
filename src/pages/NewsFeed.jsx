@@ -131,9 +131,11 @@ export default function NewsFeed() {
               }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7 }}>
-                    <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: bg, color, border: `1px solid ${border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
-                      {article.category.toUpperCase()}
-                    </span>
+                    {!article.isAlert && (
+  <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: bg, color, border: `1px solid ${border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
+      {article.category.toUpperCase()}
+    </span>
+)}
                     {article.isAlert ? (
                       <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         ⚡ ALERT
