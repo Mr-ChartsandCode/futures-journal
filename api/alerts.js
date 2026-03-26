@@ -338,9 +338,13 @@ async function fetchEconAlerts() {
     const now = new Date()
     const oneHour = 60 * 60 * 1000
 
-// Market close — 1600 EST
-const marketClose = new Date()
-marketClose.setHours(14, 0, 0, 0) // mst
+    // Market close — 21:00 UTC = 4pm ET / 2pm MT
+    const marketClose = new Date()
+    marketClose.setUTCHours(21, 0, 0, 0)
+
+    // Market open — 13:30 UTC = 9:30am ET
+    const marketOpen = new Date()
+    marketOpen.setUTCHours(13, 30, 0, 0)
 
     const G20_CURRENCIES = new Set([
   'USD','EUR','GBP','JPY','CAD','AUD','CNY','CNH','INR','BRL',
@@ -352,7 +356,7 @@ return (Array.isArray(data) ? data : [])
   if (!G20_CURRENCIES.has(e.country)) return false
   if (e.impact !== 'High' && e.impact !== 'Medium') return false
   const eventTime = new Date(e.date)
-  return eventTime <= now && now <= marketClose
+  return eventTime <= now && now <= marketClose && now >= marketOpen
 })
       .map(e => {
         const eventTime = new Date(e.date)
