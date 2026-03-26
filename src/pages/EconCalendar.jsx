@@ -29,20 +29,26 @@ function groupByDate(events) {
 }
 
 function countryBadge(country) {
+  const flags = {
+    USD: '🇺🇸', EUR: '🇪🇺', GBP: '🇬🇧', JPY: '🇯🇵', CAD: '🇨🇦',
+    AUD: '🇦🇺', CNY: '🇨🇳', CNH: '🇨🇳', INR: '🇮🇳', BRL: '🇧🇷',
+    KRW: '🇰🇷', MXN: '🇲🇽', RUB: '🇷🇺', ZAR: '🇿🇦', TRY: '🇹🇷',
+    SAR: '🇸🇦', ARS: '🇦🇷', IDR: '🇮🇩', CHF: '🇨🇭', SGD: '🇸🇬',
+  }
+  const flag = flags[country] || '🌐'
   const colors = {
     USD: '#70c0ff', EUR: '#a0d0ff', GBP: '#80b8ff',
     JPY: '#ffaa40', CAD: '#ff8844', AUD: '#ffcc44',
-    CNY: '#550000', CNH: '#550000', INR: '#ff9944',
+    CNY: '#ff6060', CNH: '#ff6060', INR: '#ff9944',
     BRL: '#44cc88', KRW: '#44aaff', MXN: '#88dd44',
-    CHF: '#550000', SGD: '#44ddaa',
+    CHF: '#dddddd', SGD: '#44ddaa',
   }
   const color = colors[country] || '#888'
   return (
-    <span style={{
-      fontSize: 13, fontWeight: 700, padding: '1px 5px', borderRadius: 3,
-      background: `${color}22`, color, border: `1px solid ${color}44`,
-      letterSpacing: '0.06em', marginRight: 6, flexShrink: 0,
-    }}>{country}</span>
+    <span style={{ marginRight: 8, flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+      <span style={{ fontSize: 16 }}>{flag}</span>
+      <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 4px', borderRadius: 3, background: `${color}22`, color, border: `1px solid ${color}44`, letterSpacing: '0.06em' }}>{country}</span>
+    </span>
   )
 }
 
