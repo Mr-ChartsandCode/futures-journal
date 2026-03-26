@@ -60,7 +60,7 @@ export default function Dashboard() {
     const grossLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0))
     const profitFactor = grossLoss > 0 ? (grossWin / grossLoss).toFixed(2) : '—'
     const expectancy = (totalPnl / filtered.length).toFixed(2)
-    // Max drawdown
+
     let cum = 0, peak = 0, maxDD = 0
     ;[...filtered].sort((a,b) => new Date(a.trade_date) - new Date(b.trade_date)).forEach(t => {
       cum += t.pnl
@@ -69,7 +69,6 @@ export default function Dashboard() {
       if (dd > maxDD) maxDD = dd
     })
 
-    // Streaks
     let curStreak = 0, maxWinStreak = 0, maxLossStreak = 0, streakType = null
     ;[...filtered].sort((a,b) => new Date(a.trade_date) - new Date(b.trade_date)).forEach(t => {
       if (t.pnl > 0) {
@@ -83,7 +82,6 @@ export default function Dashboard() {
 
     const bestTrade = Math.max(...filtered.map(t => t.pnl))
 
-    // Best / worst setup
     const setupMap = {}
     filtered.forEach(t => {
       const tag = t.trade_tags?.[0]?.tags?.name || 'Untagged'
@@ -96,10 +94,11 @@ export default function Dashboard() {
     const bestSetup = setupEntries.sort((a,b) => b[1].pnl - a[1].pnl)[0]
     const worstSetup = setupEntries.sort((a,b) => a[1].pnl - b[1].pnl)[0]
 
-    return { totalPnl, winRate, avgWin, avgLoss, profitFactor, expectancy, wins: wins.length, total: filtered.length, 
-      maxDD, maxWinStreak, maxLossStreak, bestTrade, bestSetup, worstSetup }}, [filtered])
+    return { totalPnl, winRate, avgWin, avgLoss, profitFactor, expectancy, wins: wins.length, total: filtered.length,
+      maxDD, maxWinStreak, maxLossStreak, bestTrade, bestSetup, worstSetup }
+  }, [filtered])
 
-    const equityData = useMemo(() => {
+  const equityData = useMemo(() => {
     const sorted = [...filtered].sort((a, b) => new Date(a.trade_date) - new Date(b.trade_date))
     let running = 0
     return sorted.map((t, i) => ({ i: i + 1, pnl: Math.round((running += t.pnl) * 100) / 100 }))
@@ -120,7 +119,6 @@ export default function Dashboard() {
 
   const now = new Date()
   const calDays = eachDayOfInterval({ start: startOfMonth(now), end: endOfMonth(now) })
-  const firstDow = startOfMonth(now).getDay()
   const firstWeekday = startOfMonth(now).getDay()
   const blanks = Array(firstWeekday === 0 ? 4 : Math.min(firstWeekday - 1, 4)).fill(null)
 
@@ -197,7 +195,7 @@ export default function Dashboard() {
             { label: 'Max Win Streak', value: `${stats.maxWinStreak}`, cls: '', sub: 'consecutive wins' },
             { label: 'Max Loss Streak', value: `${stats.maxLossStreak}`, cls: '', sub: 'consecutive losses' },
             { label: 'Total Trades', value: stats.total, cls: '', sub: `${stats.wins}W · ${stats.total - stats.wins}L` },
-            ].map(({ label, value, cls, sub }) => (
+          ].map(({ label, value, cls, sub }) => (
             <div key={label} className="stat-card">
               <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
               <div className={cls} style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>{value}</div>
@@ -233,7 +231,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
           <div className="card" style={{ padding: '14px' }}>
             <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>{format(now, 'MMMM yyyy')}</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 5 }}>
@@ -247,16 +245,9 @@ export default function Dashboard() {
                 const { bg, color, glow } = calColor(pnl)
                 return (
                   <div key={key} title={pnl !== undefined ? fmt(pnl) : ''} style={{
-                    aspectRatio: '1',
-                    borderRadius: 8,
-                    background: bg,
-                    boxShadow: glow,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 5,
-                    cursor: pnl !== undefined ? 'pointer' : 'default',
+                    aspectRatio: '1', borderRadius: 8, background: bg, boxShadow: glow,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: 5, cursor: pnl !== undefined ? 'pointer' : 'default',
                     border: pnl !== undefined ? '1px solid rgba(255,255,255,0.06)' : '1px solid var(--border)',
                     padding: '6px 4px',
                   }}>
@@ -272,121 +263,125 @@ export default function Dashboard() {
           </div>
 
           <div className="card" style={{ padding: '12px 14px' }}>
-  <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Recent trades</div>
-  
-  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
-  {stats.bestSetup && (
-    <div className="stat-card">
-      <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Best Setup</div>
-      <div style={{ fontSize: 16, fontWeight: 700, color: '#70c0ff', marginBottom: 4 }}>{stats.bestSetup[0]}</div>
-      <div style={{ display: 'flex', gap: 12 }}>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{fmt(stats.bestSetup[1].pnl)}</span></span>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{Math.round(stats.bestSetup[1].wins/stats.bestSetup[1].trades*100)}%</span></span>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.bestSetup[1].trades}</span></span>
-      </div>
-    </div>
-  )}
-  {stats.worstSetup && (
-    <div className="stat-card">
-      <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Worst Setup</div>
-      <div style={{ fontSize: 16, fontWeight: 700, color: '#ff6060', marginBottom: 4 }}>{stats.worstSetup[0]}</div>
-      <div style={{ display: 'flex', gap: 12 }}>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#ff6060', fontWeight: 700 }}>{fmt(stats.worstSetup[1].pnl)}</span></span>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#ff6060', fontWeight: 700 }}>{Math.round(stats.worstSetup[1].wins/stats.worstSetup[1].trades*100)}%</span></span>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.worstSetup[1].trades}</span></span>
-      </div>
-    </div>
-  )}
-</div>
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Instrument</span>
-    {['ES','NQ','CL','GC','MES','MNQ','MCL','MGC'].map(inst => (
-      <button key={inst} onClick={() => toggleArr(filterInstruments, setFilterInstruments, inst)}
-        className={filterInstruments.includes(inst) ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 13 }}>{inst}</button>
-    ))}
-  </div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Recent trades</div>
 
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Direction</span>
-    {['long','short'].map(d => (
-      <button key={d} onClick={() => setFilterDirection(prev => prev === d ? '' : d)}
-        className={filterDirection === d ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 13 }}>{d.toUpperCase()}</button>
-    ))}
-  </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Instrument</span>
+              {['ES','NQ','CL','GC','MES','MNQ','MCL','MGC'].map(inst => (
+                <button key={inst} onClick={() => toggleArr(filterInstruments, setFilterInstruments, inst)}
+                  className={filterInstruments.includes(inst) ? 'pill-active' : 'pill-inactive'}
+                  style={{ padding: '3px 8px', fontSize: 13 }}>{inst}</button>
+              ))}
+            </div>
 
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Setup</span>
-    {['Breakout','Pullback','VWAP reclaim','Opening range','Trend follow','Reversal','News play'].map(tag => (
-      <button key={tag} onClick={() => toggleArr(filterTags, setFilterTags, tag)}
-        className={filterTags.includes(tag) ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 13 }}>{tag}</button>
-    ))}
-  </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Direction</span>
+              {['long','short'].map(d => (
+                <button key={d} onClick={() => setFilterDirection(prev => prev === d ? '' : d)}
+                  className={filterDirection === d ? 'pill-active' : 'pill-inactive'}
+                  style={{ padding: '3px 8px', fontSize: 13 }}>{d.toUpperCase()}</button>
+              ))}
+            </div>
 
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
-    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Emotion</span>
-    {['focused','confident','anxious','rushed','revenge_trading','fomo','neutral','tired'].map(e => (
-      <button key={e} onClick={() => setFilterEmotion(prev => prev === e ? '' : e)}
-        className={filterEmotion === e ? 'pill-active' : 'pill-inactive'}
-        style={{ padding: '3px 8px', fontSize: 13 }}>{e.replace('_', ' ')}</button>
-    ))}
-  </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Setup</span>
+              {['Breakout','Pullback','VWAP reclaim','Opening range','Trend follow','Reversal','News play'].map(tag => (
+                <button key={tag} onClick={() => toggleArr(filterTags, setFilterTags, tag)}
+                  className={filterTags.includes(tag) ? 'pill-active' : 'pill-inactive'}
+                  style={{ padding: '3px 8px', fontSize: 13 }}>{tag}</button>
+              ))}
+            </div>
 
-  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 8 }}>
-    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Date range</span>
-    <button onClick={() => setShowDateRange(p => !p)}
-      className={showDateRange ? 'pill-active' : 'pill-inactive'}
-      style={{ padding: '3px 8px', fontSize: 13 }}>{showDateRange ? 'HIDE' : 'SET RANGE'}</button>
-    {showDateRange && (<>
-      <input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
-        style={{ width: 130, fontSize: 13, padding: '3px 6px' }} />
-      <span style={{ fontSize: 13, color: 'var(--muted)' }}>to</span>
-      <input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
-        style={{ width: 130, fontSize: 13, padding: '3px 6px' }} />
-    </>)}
-    {hasFilters && (
-      <button onClick={clearFilters} style={{ marginLeft: 'auto', fontSize: 13, padding: '3px 10px', borderRadius: 4, border: '1px solid #2a0000', background: 'transparent', color: 'var(--red)', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
-        CLEAR ALL
-      </button>
-    )}
-  </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Emotion</span>
+              {['focused','confident','anxious','rushed','revenge_trading','fomo','neutral','tired'].map(e => (
+                <button key={e} onClick={() => setFilterEmotion(prev => prev === e ? '' : e)}
+                  className={filterEmotion === e ? 'pill-active' : 'pill-inactive'}
+                  style={{ padding: '3px 8px', fontSize: 13 }}>{e.replace('_', ' ')}</button>
+              ))}
+            </div>
 
-  <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8, marginBottom: 8 }}>
-    <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.05em' }}>
-      {hasFilters
-        ? `SHOWING ${tradeFiltered.length} OF ${filtered.length} TRADES · ${activeFilterLabel}`
-        : `${filtered.length} TRADES`}
-    </span>
-  </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Date range</span>
+              <button onClick={() => setShowDateRange(p => !p)}
+                className={showDateRange ? 'pill-active' : 'pill-inactive'}
+                style={{ padding: '3px 8px', fontSize: 13 }}>{showDateRange ? 'HIDE' : 'SET RANGE'}</button>
+              {showDateRange && (<>
+                <input type="date" value={filterDateFrom} onChange={e => setFilterDateFrom(e.target.value)}
+                  style={{ width: 130, fontSize: 13, padding: '3px 6px' }} />
+                <span style={{ fontSize: 13, color: 'var(--muted)' }}>to</span>
+                <input type="date" value={filterDateTo} onChange={e => setFilterDateTo(e.target.value)}
+                  style={{ width: 130, fontSize: 13, padding: '3px 6px' }} />
+              </>)}
+              {hasFilters && (
+                <button onClick={clearFilters} style={{ marginLeft: 'auto', fontSize: 13, padding: '3px 10px', borderRadius: 4, border: '1px solid #2a0000', background: 'transparent', color: 'var(--red)', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
+                  CLEAR ALL
+                </button>
+              )}
+            </div>
 
-  <div style={{ display: 'flex', flexDirection: 'column' }}>
-    {tradeFiltered.slice(0, 8).map((t, i) => (
-      <div key={t.id} onClick={() => navigate(`/trade/${t.id}`)} style={{
-        display: 'grid', gridTemplateColumns: '44px 40px 1fr auto',
-        alignItems: 'center', gap: 8, padding: '7px 0',
-        borderBottom: i < Math.min(tradeFiltered.length, 8) - 1 ? '1px solid var(--border)' : 'none',
-        cursor: 'pointer',
-      }}>
-        <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: 13 }}>{t.instrument}</span>
-        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', color: t.direction === 'long' ? 'var(--blue-text)' : 'var(--red-text)' }}>
-          {t.direction === 'long' ? 'LONG' : 'SHRT'}
-        </span>
-        <span style={{ fontSize: 13, color: 'var(--muted)' }}>{t.trade_date}</span>
-        <span className={t.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'} style={{ fontSize: 13, fontWeight: 700, textAlign: 'right' }}>
-          {fmt(t.pnl)}
-        </span>
-      </div>
-    ))}
-    {tradeFiltered.length === 0 && (
-      <div style={{ fontSize: 15, color: 'var(--muted)', padding: '12px 0', textAlign: 'center', letterSpacing: '0.05em' }}>
-        NO TRADES MATCH THESE FILTERS
-      </div>
-    )}
-  </div>
-</div>
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.05em' }}>
+                {hasFilters
+                  ? `SHOWING ${tradeFiltered.length} OF ${filtered.length} TRADES · ${activeFilterLabel}`
+                  : `${filtered.length} TRADES`}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {tradeFiltered.slice(0, 8).map((t, i) => (
+                <div key={t.id} onClick={() => navigate(`/trade/${t.id}`)} style={{
+                  display: 'grid', gridTemplateColumns: '44px 40px 1fr auto',
+                  alignItems: 'center', gap: 8, padding: '7px 0',
+                  borderBottom: i < Math.min(tradeFiltered.length, 8) - 1 ? '1px solid var(--border)' : 'none',
+                  cursor: 'pointer',
+                }}>
+                  <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: 13 }}>{t.instrument}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', color: t.direction === 'long' ? 'var(--blue-text)' : 'var(--red-text)' }}>
+                    {t.direction === 'long' ? 'LONG' : 'SHRT'}
+                  </span>
+                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>{t.trade_date}</span>
+                  <span className={t.pnl >= 0 ? 'pnl-positive' : 'pnl-negative'} style={{ fontSize: 13, fontWeight: 700, textAlign: 'right' }}>
+                    {fmt(t.pnl)}
+                  </span>
+                </div>
+              ))}
+              {tradeFiltered.length === 0 && (
+                <div style={{ fontSize: 15, color: 'var(--muted)', padding: '12px 0', textAlign: 'center', letterSpacing: '0.05em' }}>
+                  NO TRADES MATCH THESE FILTERS
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+
+        {(stats.bestSetup || stats.worstSetup) && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+            {stats.bestSetup && (
+              <div className="stat-card">
+                <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Best Setup</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#70c0ff', marginBottom: 4 }}>{stats.bestSetup[0]}</div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{fmt(stats.bestSetup[1].pnl)}</span></span>
+                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{Math.round(stats.bestSetup[1].wins/stats.bestSetup[1].trades*100)}%</span></span>
+                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.bestSetup[1].trades}</span></span>
+                </div>
+              </div>
+            )}
+            {stats.worstSetup && (
+              <div className="stat-card">
+                <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Worst Setup</div>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#ff6060', marginBottom: 4 }}>{stats.worstSetup[0]}</div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#ff6060', fontWeight: 700 }}>{fmt(stats.worstSetup[1].pnl)}</span></span>
+                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#ff6060', fontWeight: 700 }}>{Math.round(stats.worstSetup[1].wins/stats.worstSetup[1].trades*100)}%</span></span>
+                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.worstSetup[1].trades}</span></span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
       </>)}
     </div>
   )
