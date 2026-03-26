@@ -90,7 +90,7 @@ export default function Dashboard() {
       setupMap[tag].trades++
       if (t.pnl > 0) setupMap[tag].wins++
     })
-    const setupEntries = Object.entries(setupMap).filter(([,v]) => v.trades >= 2)
+    const setupEntries = Object.entries(setupMap)
     const bestSetup = setupEntries.sort((a,b) => b[1].pnl - a[1].pnl)[0]
     const worstSetup = setupEntries.sort((a,b) => a[1].pnl - b[1].pnl)[0]
 
