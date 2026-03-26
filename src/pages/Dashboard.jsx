@@ -91,8 +91,8 @@ export default function Dashboard() {
       if (t.pnl > 0) setupMap[tag].wins++
     })
     const setupEntries = Object.entries(setupMap)
-    const bestSetup = setupEntries.sort((a,b) => b[1].pnl - a[1].pnl)[0]
-    const worstSetup = setupEntries.sort((a,b) => a[1].pnl - b[1].pnl)[0]
+    const bestSetup = [...setupEntries].sort((a,b) => b[1].pnl - a[1].pnl)[0]
+    const worstSetup = [...setupEntries].sort((a,b) => a[1].pnl - b[1].pnl)[0]
 
     return { totalPnl, winRate, avgWin, avgLoss, profitFactor, expectancy, wins: wins.length, total: filtered.length,
       maxDD, maxWinStreak, maxLossStreak, bestTrade, bestSetup, worstSetup }
@@ -355,7 +355,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {(stats.bestSetup || stats.worstSetup) && (
+        {stats.bestSetup && stats.worstSetup && stats.bestSetup[0] !== stats.worstSetup[0] && (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
             {stats.bestSetup && (
               <div className="stat-card">
