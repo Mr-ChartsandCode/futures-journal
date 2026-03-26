@@ -140,7 +140,7 @@ export default function NewsFeed() {
                       <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         ⚡ ALERT
                       </span>
-                    ) : isLive && (
+                    ) : isLive && !article.isAlert && (
                       <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         LIVE
                       </span>

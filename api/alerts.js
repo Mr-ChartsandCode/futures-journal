@@ -358,7 +358,9 @@ async function fetchEconAlerts() {
       })
       .map(e => {
         const eventTime = new Date(e.date)
-        const headline = `⚡ ${e.title} (${e.country}) — Released ${eventTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
+        const headline = `⚡ ${e.title} (${e.country}) — Released ${eventTime.toLocaleTimeString('en-US', 
+          { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })} ET${e.forecast ? 
+            ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
         return {
           id: `econ-${e.title}-${e.date}`,
           headline,
