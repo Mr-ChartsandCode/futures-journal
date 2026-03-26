@@ -141,10 +141,10 @@ export default function EconCalendar() {
                 alignItems: 'center',
                 gap: 10,
               }}>
-                <span style={{ fontSize: 15, fontWeight: 700, color: dateStr === today ? '#70c0ff' : '#444', letterSpacing: '0.1em' }}>
+                <span style={{ fontSize: 15, fontWeight: 700, color: dateStr === today ? '#70c0ff' : '#616161', letterSpacing: '0.1em' }}>
                   {dayLabel(dateStr)}
                 </span>
-                <span style={{ fontSize: 15, color: '#333' }}>{dayEvents.length} EVENTS</span>
+                <span style={{ fontSize: 15, color: '#616161' }}>{dayEvents.length} EVENTS</span>
               </div>
 
               {dayEvents.map((event, i) => {
@@ -178,15 +178,16 @@ export default function EconCalendar() {
                         {event.previous && (
                           <span style={{ color: '#555', fontSize: 14 }}>Previous: <span style={{ color: '#888' }}>{event.previous}</span></span>
                         )}
-                        {event.actual && (
-                          <span style={{ color: '#555', fontSize: 14 }}>Actual: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{event.actual}</span></span>
-                        )}
+
                       </div>
                     </div>
 
-                    <span style={{ fontSize: 15, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: bg, color, border: `1px solid ${border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
-                      {event.impact?.toUpperCase()}
-                    </span>
+
+                    {event.actual && (
+                      <span style={{ fontSize: 15, fontWeight: 700, color: '#70c0ff', letterSpacing: '0.04em', flexShrink: 0, minWidth: 60, textAlign: 'right' }}>
+                        {event.actual}
+                      </span>
+                    )}
                   </div>
                 )
               })}
