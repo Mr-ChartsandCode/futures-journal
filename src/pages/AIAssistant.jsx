@@ -25,7 +25,7 @@ function Message({ msg }) {
         <div style={{
           width: 28, height: 28, borderRadius: 6, background: 'linear-gradient(135deg,#001428,#003080)',
           border: '1px solid #003080', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 12, flexShrink: 0, marginTop: 2,
+          fontSize: 16, flexShrink: 0, marginTop: 2,
         }}>🤖</div>
       )}
       <div style={{
@@ -34,7 +34,7 @@ function Message({ msg }) {
         border: `1px solid ${isUser ? '#003080' : '#1e1e1e'}`,
         borderRadius: isUser ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
         padding: '10px 14px',
-        fontSize: 14,
+        fontSize: 18,
         lineHeight: 1.6,
         color: '#e0e0e0',
         whiteSpace: 'pre-wrap',
@@ -49,7 +49,7 @@ function Message({ msg }) {
         <div style={{
           width: 28, height: 28, borderRadius: 6, background: '#001428',
           border: '1px solid #003080', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 12, flexShrink: 0, marginTop: 2,
+          fontSize: 16, flexShrink: 0, marginTop: 2,
         }}>👤</div>
       )}
     </div>
@@ -141,18 +141,18 @@ export default function AIAssistant() {
 
       <div style={{ borderBottom: '1px solid var(--border)', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(180deg,#0f0f0f,#000)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', color: '#f0f0f0', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.05em', color: '#f0f0f0', textTransform: 'uppercase' }}>
             AI Trading Coach
           </span>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setIncludeTradeContext(p => !p)} style={{
-              fontSize: 10, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
+              fontSize: 14, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
               fontFamily: 'var(--font)', letterSpacing: '0.04em', border: 'none',
               background: includeTradeContext ? '#001428' : '#111',
               color: includeTradeContext ? '#70c0ff' : '#555',
             }}>📊 TRADE DATA {includeTradeContext ? 'ON' : 'OFF'}</button>
             <button onClick={() => setIncludeNewsContext(p => !p)} style={{
-              fontSize: 10, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
+              fontSize: 14, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
               fontFamily: 'var(--font)', letterSpacing: '0.04em', border: 'none',
               background: includeNewsContext ? '#001428' : '#111',
               color: includeNewsContext ? '#70c0ff' : '#555',
@@ -162,7 +162,7 @@ export default function AIAssistant() {
         <button onClick={() => setMessages([{
           role: 'assistant',
           content: "Hey! I'm your AI trading coach. I have access to your trade journal and can analyze charts you share with me.\n\nUse the quick actions below to get started, or ask me anything about your trading.",
-        }])} style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)' }}>
+        }])} style={{ fontSize: 14, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)' }}>
           NEW CHAT
         </button>
       </div>
@@ -172,7 +172,7 @@ export default function AIAssistant() {
 
         {loading && (
           <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 6, background: 'linear-gradient(135deg,#001428,#003080)', border: '1px solid #003080', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>🤖</div>
+            <div style={{ width: 28, height: 28, borderRadius: 6, background: 'linear-gradient(135deg,#001428,#003080)', border: '1px solid #003080', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🤖</div>
             <div style={{ background: 'linear-gradient(160deg,#111,#0a0a0a)', border: '1px solid #1e1e1e', borderRadius: '12px 12px 12px 2px', padding: '10px 14px', display: 'flex', gap: 4, alignItems: 'center' }}>
               {[0,1,2].map(i => (
                 <div key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#70c0ff', animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.2}s`, opacity: 0.7 }} />
@@ -189,7 +189,7 @@ export default function AIAssistant() {
             <button key={action.label} onClick={() => sendMessage(action.prompt)}
               disabled={loading}
               style={{
-                fontSize: 11, padding: '5px 10px', borderRadius: 6, cursor: loading ? 'default' : 'pointer',
+                fontSize: 15, padding: '5px 10px', borderRadius: 6, cursor: loading ? 'default' : 'pointer',
                 fontFamily: 'var(--font)', border: '1px solid #1e1e1e',
                 background: '#0a0a0a', color: loading ? '#333' : '#888',
                 transition: 'all 0.15s',
@@ -204,15 +204,15 @@ export default function AIAssistant() {
           <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
             <img src={`data:${pendingImage.mediaType};base64,${pendingImage.data}`}
               alt="pending" style={{ height: 48, borderRadius: 4, border: '1px solid #003080' }} />
-            <span style={{ fontSize: 11, color: '#70c0ff' }}>Chart attached</span>
-            <button onClick={() => setPendingImage(null)} style={{ fontSize: 11, color: '#ff6060', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+            <span style={{ fontSize: 15, color: '#70c0ff' }}>Chart attached</span>
+            <button onClick={() => setPendingImage(null)} style={{ fontSize: 15, color: '#ff6060', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
           </div>
         )}
 
         <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
           <button onClick={() => fileRef.current?.click()} style={{
             padding: '8px 10px', borderRadius: 6, border: '1px solid #1e1e1e',
-            background: '#0a0a0a', color: '#666', cursor: 'pointer', fontSize: 16, flexShrink: 0,
+            background: '#0a0a0a', color: '#666', cursor: 'pointer', fontSize: 20, flexShrink: 0,
           }}>📎</button>
           <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
 
@@ -224,7 +224,7 @@ export default function AIAssistant() {
             placeholder="Ask about your trades, paste a chart, or ask anything market-related... (Enter to send, Shift+Enter for new line)"
             rows={2}
             style={{
-              flex: 1, fontSize: 13, padding: '8px 12px', background: '#0a0a0a',
+              flex: 1, fontSize: 17, padding: '8px 12px', background: '#0a0a0a',
               border: '1px solid #2a2a2a', borderRadius: 6, color: '#f0f0f0',
               resize: 'none', fontFamily: 'var(--font)', lineHeight: 1.5,
               outline: 'none',
@@ -238,7 +238,7 @@ export default function AIAssistant() {
               padding: '8px 16px', borderRadius: 6, border: 'none', cursor: loading ? 'default' : 'pointer',
               background: loading || (!input.trim() && !pendingImage) ? '#001020' : 'linear-gradient(135deg,#001428,#003080)',
               color: loading || (!input.trim() && !pendingImage) ? '#333' : '#70c0ff',
-              fontFamily: 'var(--font)', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em',
+              fontFamily: 'var(--font)', fontSize: 16, fontWeight: 700, letterSpacing: '0.05em',
               flexShrink: 0,
             }}
           >SEND</button>
