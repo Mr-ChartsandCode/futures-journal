@@ -147,7 +147,7 @@ export default async function handler(req, res) {
       usage: response.usage,
     })
   } catch (err) {
-    console.error('AI error:', err)
-    res.status(500).json({ error: err.message })
+    console.error('AI error:', JSON.stringify(err, null, 2))
+    res.status(500).json({ error: err.message, details: err.error || err.status || String(err) })
   }
 }
