@@ -95,6 +95,12 @@ const ALWAYS_PASS = [
   'index removal','nasdaq 100 addition','nasdaq 100 removal','dow jones addition','dow jones removal','replaces',
   'added to the dow','removed from the dow','index change','index membership','constituent change','etf rebalance',
   's&p reshuffle','russell rebalance','index inclusion','index exclusion',
+  // Key speakers
+  'jerome powell', 'powell speaks', 'powell speech', 'fed chair powell',
+  'scott bessent', 'bessent speaks', 'bessent speech',
+  'donald trump', 'trump speaks', 'trump press',
+  'fed governor', 'fed president speaks', 'fomc member speaks',
+  'press conference', 'live now', 'speaking now', 'remarks',
 ]
 
 function isJunk(headline) {

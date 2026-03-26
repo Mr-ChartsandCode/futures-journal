@@ -358,9 +358,11 @@ async function fetchEconAlerts() {
       })
       .map(e => {
         const eventTime = new Date(e.date)
-        const headline = `⚡ ${e.title} (${e.country}) — Released ${eventTime.toLocaleTimeString('en-US', 
-          { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })} ET${e.forecast ? 
-            ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
+        const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(e.title)
+        const headline = `${isSpeaker ? '🎤' : '⚡'} ${e.title} (${e.country}) — ${isSpeaker ? 
+          'SPEAKING NOW' : `Released ${eventTime.toLocaleTimeString('en-US', 
+            { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })} ET`}${e.forecast ? 
+              ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
         return {
           id: `econ-${e.title}-${e.date}`,
           headline,

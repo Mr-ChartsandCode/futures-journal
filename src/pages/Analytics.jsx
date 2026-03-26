@@ -1,71 +1,5 @@
 import { useState, useMemo } from 'react'
-
-// ── Sample Data ─────────────────────────────────────────────────────────────
-const SAMPLE_TRADES = (() => {
-  const setups = ['Break & Retest', 'VWAP Reclaim', 'Opening Range', 'Trend Continuation', 'Mean Reversion', 'Liquidity Grab']
-  const instruments = ['ES', 'NQ', 'CL', 'GC', 'MES', 'MNQ']
-  const emotions = ['Calm', 'Confident', 'Anxious', 'Revenge', 'FOMO', 'Neutral']
-  const days = [1, 2, 3, 4, 5] // Mon-Fri
-  const hours = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-
-  const tickValues = { ES: 12.5, NQ: 5, CL: 10, GC: 10, MES: 1.25, MNQ: 0.5 }
-
-  const setupBias = {
-    'Break & Retest':       { winRate: 0.62, avgR: 1.8, stdDev: 0.4 },
-    'VWAP Reclaim':         { winRate: 0.55, avgR: 1.5, stdDev: 0.5 },
-    'Opening Range':        { winRate: 0.48, avgR: 2.1, stdDev: 0.8 },
-    'Trend Continuation':   { winRate: 0.67, avgR: 1.6, stdDev: 0.3 },
-    'Mean Reversion':       { winRate: 0.44, avgR: 1.3, stdDev: 0.6 },
-    'Liquidity Grab':       { winRate: 0.71, avgR: 2.4, stdDev: 0.5 },
-  }
-
-  const emotionBias = {
-    'Calm':       1.2, 'Confident': 1.1, 'Neutral': 1.0,
-    'Anxious':   0.6, 'FOMO':      0.4, 'Revenge':  0.2,
-  }
-
-  const dayBias   = { 1: 1.1, 2: 1.2, 3: 0.9, 4: 1.0, 5: 0.7 }
-  const hourBias  = { 7:1.3,8:1.4,9:1.2,10:1.1,11:0.9,12:0.7,13:0.8,14:1.0,15:1.1,16:0.8 }
-
-  const trades = []
-  const start = new Date('2026-01-02')
-
-  for (let i = 0; i < 120; i++) {
-    const date = new Date(start)
-    date.setDate(start.getDate() + Math.floor(i * 1.8))
-    const dow = date.getDay()
-    if (dow === 0 || dow === 6) date.setDate(date.getDate() + 1)
-
-    const setup    = setups[Math.floor(Math.random() * setups.length)]
-    const instr    = instruments[Math.floor(Math.random() * instruments.length)]
-    const emotion  = emotions[Math.floor(Math.random() * emotions.length)]
-    const hour     = hours[Math.floor(Math.random() * hours.length)]
-    const bias     = setupBias[setup]
-    const eBias    = emotionBias[emotion]
-    const dBias    = dayBias[date.getDay()] || 1
-    const hBias    = hourBias[hour] || 1
-    const adjWR    = Math.min(0.95, Math.max(0.05, bias.winRate * eBias * dBias * hBias))
-    const win      = Math.random() < adjWR
-    const ticks    = win
-      ? Math.round((bias.avgR + (Math.random() - 0.5) * bias.stdDev * 4) * 4) * 2
-      : -Math.round((1 + Math.random() * 1.5) * 4) * 2
-    const pnl      = ticks * tickValues[instr]
-    const stopW    = Math.round(4 + Math.random() * 12)
-    const mae      = win ? -Math.round(Math.random() * stopW * 0.6) : ticks
-    const mfe      = win ? ticks + Math.round(Math.random() * 8) : Math.round(Math.random() * 4)
-
-    date.setHours(hour, Math.floor(Math.random() * 60))
-
-    trades.push({
-      id: i, date: date.toISOString(), instrument: instr,
-      setup, emotion, pnl, ticks, win,
-      stopWidth: stopW, mae, mfe,
-      rr: win ? +(ticks / (stopW * 2)).toFixed(2) : +(ticks / (stopW * 2)).toFixed(2),
-      hour, dow: date.getDay(),
-    })
-  }
-  return trades.sort((a, b) => new Date(a.date) - new Date(b.date))
-})()
+import { useTrades } from '../hooks/useTrades'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 const DAYS   = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']
@@ -122,38 +56,27 @@ function BarChart({ data, valueKey, labelKey, colorFn }) {
   )
 }
 
-// ── Equity Curve ─────────────────────────────────────────────────────────────
-function EquityCurve({ trades }) {
-  let cum = 0
-  const points = trades.map(t => { cum += t.pnl; return cum })
-  const max = Math.max(...points)
-  const min = Math.min(...points)
-  const range = max - min || 1
-  const W = 600, H = 120
-  const pts = points.map((v, i) => {
-    const x = (i / (points.length - 1)) * W
-    const y = H - ((v - min) / range) * H
-    return `${x},${y}`
-  }).join(' ')
-  const fillPts = `0,${H} ${pts} ${W},${H}`
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 120 }} preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="eq" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#70c0ff" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#70c0ff" stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      <polygon points={fillPts} fill="url(#eq)" />
-      <polyline points={pts} fill="none" stroke="#70c0ff" strokeWidth="1.5" />
-    </svg>
-  )
-}
-
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Analytics() {
   const [tab, setTab] = useState('setups')
-  const trades = SAMPLE_TRADES
+  const { trades: rawTrades, loading } = useTrades()
+
+  const trades = rawTrades.map(t => ({
+    id: t.id,
+    date: t.trade_date,
+    instrument: t.instrument,
+    setup: t.trade_tags?.[0]?.tags?.name || 'Untagged',
+    emotion: t.emotion || 'Neutral',
+    pnl: t.pnl || 0,
+    win: (t.pnl || 0) > 0,
+    stopWidth: t.stop_loss ? Math.abs(t.entry_price - t.stop_loss) : 8,
+    mae: 0,
+    mfe: 0,
+    rr: t.pnl > 0 ? 1.5 : -1,
+    hour: new Date(t.trade_date + 'T12:00:00').getHours(),
+    dow: new Date(t.trade_date + 'T12:00:00').getDay(),
+    ticks: t.pnl || 0,
+  }))
   const wins   = trades.filter(t => t.win)
   const losses = trades.filter(t => !t.win)
 
@@ -328,6 +251,19 @@ export default function Analytics() {
   }, [emotionStats, dowStats, setupStats, trades])
 
   const TABS = ['setups', 'time', 'instruments', 'psychology', 'killers']
+
+  if (loading) return (
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#555', fontSize: 12, letterSpacing: '0.05em', fontFamily: 'var(--font)' }}>
+      LOADING TRADES...
+    </div>
+  )
+
+  if (!trades.length) return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#444', fontSize: 13, letterSpacing: '0.05em', fontFamily: 'var(--font)', gap: 8 }}>
+      <div>NO TRADES YET</div>
+      <div style={{ fontSize: 11, color: '#333' }}>Add trades to your journal to see deep analytics</div>
+    </div>
+  )
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', fontFamily: 'var(--font)' }}>
