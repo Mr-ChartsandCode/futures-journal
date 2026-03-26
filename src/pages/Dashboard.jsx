@@ -83,10 +83,23 @@ export default function Dashboard() {
 
     const bestTrade = Math.max(...filtered.map(t => t.pnl))
 
-    return { totalPnl, winRate, avgWin, avgLoss, profitFactor, expectancy, wins: wins.length, 
-      total: filtered.length, maxDD, maxWinStreak, maxLossStreak, bestTrade }}, [filtered])
+    // Best / worst setup
+    const setupMap = {}
+    filtered.forEach(t => {
+      const tag = t.trade_tags?.[0]?.tags?.name || 'Untagged'
+      if (!setupMap[tag]) setupMap[tag] = { pnl: 0, trades: 0, wins: 0 }
+      setupMap[tag].pnl += t.pnl
+      setupMap[tag].trades++
+      if (t.pnl > 0) setupMap[tag].wins++
+    })
+    const setupEntries = Object.entries(setupMap).filter(([,v]) => v.trades >= 2)
+    const bestSetup = setupEntries.sort((a,b) => b[1].pnl - a[1].pnl)[0]
+    const worstSetup = setupEntries.sort((a,b) => a[1].pnl - b[1].pnl)[0]
 
-  const equityData = useMemo(() => {
+    return { totalPnl, winRate, avgWin, avgLoss, profitFactor, expectancy, wins: wins.length, total: filtered.length, 
+      maxDD, maxWinStreak, maxLossStreak, bestTrade, bestSetup, worstSetup }}, [filtered])
+
+    const equityData = useMemo(() => {
     const sorted = [...filtered].sort((a, b) => new Date(a.trade_date) - new Date(b.trade_date))
     let running = 0
     return sorted.map((t, i) => ({ i: i + 1, pnl: Math.round((running += t.pnl) * 100) / 100 }))
@@ -260,7 +273,31 @@ export default function Dashboard() {
 
           <div className="card" style={{ padding: '12px 14px' }}>
   <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>Recent trades</div>
-
+  
+  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+  {stats.bestSetup && (
+    <div className="stat-card">
+      <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Best Setup</div>
+      <div style={{ fontSize: 16, fontWeight: 700, color: '#70c0ff', marginBottom: 4 }}>{stats.bestSetup[0]}</div>
+      <div style={{ display: 'flex', gap: 12 }}>
+        <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{fmt(stats.bestSetup[1].pnl)}</span></span>
+        <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{Math.round(stats.bestSetup[1].wins/stats.bestSetup[1].trades*100)}%</span></span>
+        <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.bestSetup[1].trades}</span></span>
+      </div>
+    </div>
+  )}
+  {stats.worstSetup && (
+    <div className="stat-card">
+      <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Worst Setup</div>
+      <div style={{ fontSize: 16, fontWeight: 700, color: '#ff6060', marginBottom: 4 }}>{stats.worstSetup[0]}</div>
+      <div style={{ display: 'flex', gap: 12 }}>
+        <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#ff6060', fontWeight: 700 }}>{fmt(stats.worstSetup[1].pnl)}</span></span>
+        <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#ff6060', fontWeight: 700 }}>{Math.round(stats.worstSetup[1].wins/stats.worstSetup[1].trades*100)}%</span></span>
+        <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.worstSetup[1].trades}</span></span>
+      </div>
+    </div>
+  )}
+</div>
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', marginBottom: 6 }}>
     <span style={{ fontSize: 13, color: 'var(--muted2)', letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 2 }}>Instrument</span>
     {['ES','NQ','CL','GC','MES','MNQ','MCL','MGC'].map(inst => (

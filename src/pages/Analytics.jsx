@@ -348,10 +348,10 @@ export default function Analytics() {
         <span style={{ fontSize: 10, color: '#333', letterSpacing: '0.05em' }}>SAMPLE DATA — {trades.length} TRADES</span>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+      <div style={{ flex: 1, overflow: 'hidden', padding: '16px 20px', display: 'flex', flexDirection: 'column' }}>
 
         {tab === 'setups' && (
-          <div>
+          <div style={{ flex: 1, overflowY: 'auto', height: '100%' }}>
             <div style={{ ...CARD, marginBottom: 12 }}>
               <div style={LABEL}>Setup Scorecard — ranked by edge score</div>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
@@ -406,7 +406,7 @@ export default function Analytics() {
         )}
 
         {tab === 'time' && (
-          <div>
+          <div style={{ flex: 1, overflowY: 'auto', height: '100%' }}>
             <div style={{ ...CARD, marginBottom: 12 }}>
               <div style={LABEL}>P&L heatmap — day × hour (EDT)</div>
               <div style={{ overflowX: 'auto' }}>
@@ -462,7 +462,7 @@ export default function Analytics() {
         )}
 
         {tab === 'instruments' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ flex: 1, overflowY: 'auto', height: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div style={CARD}>
               <div style={LABEL}>P&L by instrument</div>
               <BarChart data={instrStats} valueKey="pnl" labelKey="instrument" colorFn={color} />
@@ -503,7 +503,7 @@ export default function Analytics() {
         )}
 
         {tab === 'psychology' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ flex: 1, overflowY: 'auto', height: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, alignContent: 'start' }}>
             <div style={CARD}>
               <div style={LABEL}>P&L by emotion</div>
               <BarChart data={emotionStats} valueKey="pnl" labelKey="emotion" colorFn={color} />
@@ -544,7 +544,7 @@ export default function Analytics() {
         )}
 
         {tab === 'killers' && (
-          <div>
+          <div style={{ flex: 1, overflowY: 'auto', height: '100%' }}>
             <div style={{ marginBottom: 16, fontSize: 12, color: '#555' }}>
               Automatically identified patterns that are hurting your performance. Based on {trades.length} trades.
             </div>
