@@ -425,11 +425,7 @@ export default async function handler(req, res) {
 
     const econAlerts = await fetchEconAlerts()
     const allAlerts = [...econAlerts, ...alerts]
-    allAlerts.sort((a, b) => {
-      if (a.alertType === 'economic' && b.alertType !== 'economic') return -1
-      if (b.alertType === 'economic' && a.alertType !== 'economic') return 1
-      return Math.abs(b.changePct) - Math.abs(a.changePct)
-    })
+    allAlerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     res.status(200).json({ alerts: allAlerts, count: allAlerts.length })
   } catch (err) {
     console.error('Alerts error:', err)
