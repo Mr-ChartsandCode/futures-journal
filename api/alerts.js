@@ -329,6 +329,11 @@ const TRACKED_TICKERS = [
   { symbol: 'PTGX',  name: 'Protagonist Therapeutics', sector: 'Biotech', cap: 2 },
 ]
 
+const G20_CURRENCIES = new Set([
+  'USD','EUR','GBP','JPY','CAD','AUD','CNY','CNH','INR','BRL',
+  'KRW','MXN','RUB','ZAR','TRY','SAR','ARS','IDR','CHF','SGD'
+])
+
 async function fetchEconAlerts() {
   try {
     const r = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json', {
@@ -336,38 +341,28 @@ async function fetchEconAlerts() {
     })
     const data = await r.json()
     const now = new Date()
-    const oneHour = 60 * 60 * 1000
 
-    // Market close — 21:00 UTC = 4pm ET / 2pm MT
     const marketClose = new Date()
     marketClose.setUTCHours(21, 0, 0, 0)
 
-    // Market open — 13:30 UTC = 9:30am ET
     const marketOpen = new Date()
     marketOpen.setUTCHours(13, 30, 0, 0)
 
-    const G20_CURRENCIES = new Set([
-  'USD','EUR','GBP','JPY','CAD','AUD','CNY','CNH','INR','BRL',
-  'KRW','MXN','RUB','ZAR','TRY','SAR','ARS','IDR','CHF','SGD'
-])
-
-return (Array.isArray(data) ? data : [])
-  .filter(e => {
-  if (!G20_CURRENCIES.has(e.country)) return false
-  if (e.impact !== 'High' && e.impact !== 'Medium') return false
-  const eventTime = new Date(e.date)
-  const isToday = eventTime.toDateString() === now.toDateString()
-  return isToday && eventTime <= now && now <= marketClose
-})
+    return (Array.isArray(data) ? data : [])
+      .filter(e => {
+        if (!G20_CURRENCIES.has(e.country)) return false
+        if (e.impact !== 'High' && e.impact !== 'Medium') return false
+        const eventTime = new Date(e.date)
+        const isToday = eventTime.toDateString() === now.toDateString()
+        return isToday && eventTime <= now && now >= marketOpen && now <= marketClose
+      })
       .map(e => {
         const eventTime = new Date(e.date)
-        const headline = `⚡ ${e.title} (${e.country}) — Released ${eventTime.toLocaleTimeString('en-US', 
-          { hour: 'numeric', minute: '2-digit' })}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}
-          ${e.previous ? ` | Previous: ${e.previous}` : ''}`
+        const headline = `⚡ ${e.title} (${e.country}) — Released ${eventTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
         return {
           id: `econ-${e.title}-${e.date}`,
           headline,
-          summary: `High impact US economic event. ${e.forecast ? `Forecast: ${e.forecast}.` : ''} ${e.previous ? `Previous: ${e.previous}.` : ''} ${e.actual ? `Actual result: ${e.actual}.` : ''}`,
+          summary: `${e.country} economic event.${e.forecast ? ` Forecast: ${e.forecast}.` : ''}${e.previous ? ` Previous: ${e.previous}.` : ''}${e.actual ? ` Actual: ${e.actual}.` : ''}`,
           source: 'ECON ALERT',
           category: 'Alert',
           created_at: e.date,
@@ -387,7 +382,6 @@ export default async function handler(req, res) {
   const now = new Date().toISOString()
 
   try {
-    // Check big movers — batch into groups of 20 to avoid URL length limits
     const BATCH_SIZE = 20
     const batches = []
     for (let i = 0; i < TRACKED_TICKERS.length; i += BATCH_SIZE) {
@@ -429,7 +423,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Sort movers by magnitude
     const econAlerts = await fetchEconAlerts()
     const allAlerts = [...econAlerts, ...alerts]
     allAlerts.sort((a, b) => {
