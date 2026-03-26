@@ -24,9 +24,13 @@ export default async function handler(req, res) {
       ...(Array.isArray(nextWeek) ? nextWeek : [])
     ]
 
+    const todayStart = new Date()
+    todayStart.setUTCHours(0, 0, 0, 0)
+
     const filtered = allEvents
       .filter(e => G20_CURRENCIES.has(e.country))
       .filter(e => e.impact === 'High' || e.impact === 'Medium')
+      .filter(e => new Date(e.date) >= todayStart)
       .map(e => ({
         title: e.title,
         country: e.country,
