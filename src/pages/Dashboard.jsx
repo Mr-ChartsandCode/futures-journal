@@ -202,6 +202,23 @@ export default function Dashboard() {
               <div style={{ fontSize: 15, color: 'var(--muted)', marginTop: 3 }}>{sub}</div>
             </div>
           ))}
+          {stats.bestSetup && (
+            <div className="stat-card">
+              <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Best · Worst Setup</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#70c0ff', marginBottom: 2 }}>{stats.bestSetup[0]}</div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmt(stats.bestSetup[1].pnl)} · {Math.round(stats.bestSetup[1].wins/stats.bestSetup[1].trades*100)}%</div>
+                </div>
+                {stats.worstSetup && stats.worstSetup[0] !== stats.bestSetup[0] && (
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#ff6060', marginBottom: 2 }}>{stats.worstSetup[0]}</div>
+                    <div style={{ fontSize: 12, color: 'var(--muted)' }}>{fmt(stats.worstSetup[1].pnl)} · {Math.round(stats.worstSetup[1].wins/stats.worstSetup[1].trades*100)}%</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, marginBottom: 8 }}>
@@ -354,34 +371,6 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-
-        {stats.bestSetup && stats.worstSetup && stats.bestSetup[0] !== stats.worstSetup[0] && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
-            {stats.bestSetup && (
-              <div className="stat-card">
-                <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Best Setup</div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#70c0ff', marginBottom: 4 }}>{stats.bestSetup[0]}</div>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{fmt(stats.bestSetup[1].pnl)}</span></span>
-                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#70c0ff', fontWeight: 700 }}>{Math.round(stats.bestSetup[1].wins/stats.bestSetup[1].trades*100)}%</span></span>
-                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.bestSetup[1].trades}</span></span>
-                </div>
-              </div>
-            )}
-            {stats.worstSetup && (
-              <div className="stat-card">
-                <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Worst Setup</div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#ff6060', marginBottom: 4 }}>{stats.worstSetup[0]}</div>
-                <div style={{ display: 'flex', gap: 12 }}>
-                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>P&L: <span style={{ color: '#ff6060', fontWeight: 700 }}>{fmt(stats.worstSetup[1].pnl)}</span></span>
-                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>WR: <span style={{ color: '#ff6060', fontWeight: 700 }}>{Math.round(stats.worstSetup[1].wins/stats.worstSetup[1].trades*100)}%</span></span>
-                  <span style={{ fontSize: 13, color: 'var(--muted)' }}>Trades: <span style={{ color: '#888', fontWeight: 700 }}>{stats.worstSetup[1].trades}</span></span>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
       </>)}
     </div>
   )
