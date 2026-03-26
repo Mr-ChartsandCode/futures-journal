@@ -152,7 +152,7 @@ function EquityCurve({ trades }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Analytics() {
-  const [tab, setTab] = useState('overview')
+  const [tab, setTab] = useState('setups')
   const trades = SAMPLE_TRADES
   const wins   = trades.filter(t => t.win)
   const losses = trades.filter(t => !t.win)
@@ -327,7 +327,7 @@ export default function Analytics() {
     return issues
   }, [emotionStats, dowStats, setupStats, trades])
 
-  const TABS = ['overview', 'setups', 'time', 'instruments', 'psychology', 'killers']
+  const TABS = ['setups', 'time', 'instruments', 'psychology', 'killers']
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', fontFamily: 'var(--font)' }}>
@@ -349,36 +349,6 @@ export default function Analytics() {
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
-
-        {tab === 'overview' && (
-          <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
-              {[
-                ['Total P&L', fmt(stats.totalPnl), color(stats.totalPnl)],
-                ['Win Rate', `${(stats.winRate*100).toFixed(1)}%`, color(stats.winRate - 0.5)],
-                ['Profit Factor', stats.profitFactor, color(parseFloat(stats.profitFactor) - 1.5)],
-                ['Avg R:R', stats.avgRR.toFixed(2), color(stats.avgRR - 1)],
-                ['Avg Winner', fmt(stats.avgWin), '#70c0ff'],
-                ['Avg Loser', fmt(stats.avgLoss), '#ff6060'],
-                ['Max Drawdown', `-$${stats.maxDD.toFixed(0)}`, '#ff6060'],
-                ['Best Trade', fmt(stats.bestTrade), '#70c0ff'],
-                ['Worst Trade', fmt(stats.worstTrade), '#ff6060'],
-                ['Max Win Streak', stats.maxWinStreak, '#70c0ff'],
-                ['Max Loss Streak', stats.maxLossStreak, '#ff6060'],
-                ['Total Trades', trades.length, '#888'],
-              ].map(([label, val, c]) => (
-                <div key={label} style={{ ...CARD, padding: '12px 14px' }}>
-                  <div style={LABEL}>{label}</div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: c }}>{val}</div>
-                </div>
-              ))}
-            </div>
-            <div style={CARD}>
-              <div style={LABEL}>Equity Curve</div>
-              <EquityCurve trades={trades} />
-            </div>
-          </div>
-        )}
 
         {tab === 'setups' && (
           <div>
@@ -445,21 +415,21 @@ export default function Analytics() {
                     <tr>
                       <th style={{ padding: '4px 8px', color: '#555', fontWeight: 600, width: 50 }}></th>
                       {HOURS.map(h => (
-                        <th key={h} style={{ padding: '4px 6px', color: '#555', fontWeight: 600, textAlign: 'center', width: 70 }}>{h}:00</th>
+                        <th key={h} style={{ padding: '4px 6px', color: '#aaa', fontWeight: 600, textAlign: 'center', width: 70 }}>{h}:00</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {[1,2,3,4,5].map(d => (
                       <tr key={d}>
-                        <td style={{ padding: '4px 8px', color: '#888', fontWeight: 700, fontSize: 12 }}>{DAYS[d]}</td>
+                        <td style={{ padding: '4px 8px', color: '#ccc', fontWeight: 700, fontSize: 12 }}>{DAYS[d]}</td>
                         {HOURS.map(h => {
                           const val = timeHeatmap[`${d}-${h}`]
                           return (
                             <td key={h} style={{
                               padding: '8px 4px', textAlign: 'center', borderRadius: 4,
                               background: heatColor(val, heatMax),
-                              color: val === null ? '#222' : val >= 0 ? '#70c0ff' : '#ff6060',
+                              color: val === null ? '#444' : '#ffffff',
                               fontWeight: 700, fontSize: 11,
                             }}>
                               {val === null ? '·' : val >= 0 ? `+${val.toFixed(0)}` : val.toFixed(0)}

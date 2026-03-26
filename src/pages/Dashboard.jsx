@@ -60,8 +60,31 @@ export default function Dashboard() {
     const grossLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0))
     const profitFactor = grossLoss > 0 ? (grossWin / grossLoss).toFixed(2) : '—'
     const expectancy = (totalPnl / filtered.length).toFixed(2)
-    return { totalPnl, winRate, avgWin, avgLoss, profitFactor, expectancy, wins: wins.length, total: filtered.length }
-  }, [filtered])
+    // Max drawdown
+    let cum = 0, peak = 0, maxDD = 0
+    ;[...filtered].sort((a,b) => new Date(a.trade_date) - new Date(b.trade_date)).forEach(t => {
+      cum += t.pnl
+      if (cum > peak) peak = cum
+      const dd = peak - cum
+      if (dd > maxDD) maxDD = dd
+    })
+
+    // Streaks
+    let curStreak = 0, maxWinStreak = 0, maxLossStreak = 0, streakType = null
+    ;[...filtered].sort((a,b) => new Date(a.trade_date) - new Date(b.trade_date)).forEach(t => {
+      if (t.pnl > 0) {
+        streakType === 'win' ? curStreak++ : (curStreak = 1, streakType = 'win')
+        if (curStreak > maxWinStreak) maxWinStreak = curStreak
+      } else {
+        streakType === 'loss' ? curStreak++ : (curStreak = 1, streakType = 'loss')
+        if (curStreak > maxLossStreak) maxLossStreak = curStreak
+      }
+    })
+
+    const bestTrade = Math.max(...filtered.map(t => t.pnl))
+
+    return { totalPnl, winRate, avgWin, avgLoss, profitFactor, expectancy, wins: wins.length, 
+      total: filtered.length, maxDD, maxWinStreak, maxLossStreak, bestTrade }}, [filtered])
 
   const equityData = useMemo(() => {
     const sorted = [...filtered].sort((a, b) => new Date(a.trade_date) - new Date(b.trade_date))
@@ -150,13 +173,18 @@ export default function Dashboard() {
         </div>
       ) : (<>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0,1fr))', gap: 8, marginBottom: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0,1fr))', gap: 8, marginBottom: 8 }}>
           {[
             { label: 'Net P&L', value: fmt(stats.totalPnl), cls: stats.totalPnl >= 0 ? 'pnl-positive' : 'pnl-negative', sub: `${stats.total} trades` },
             { label: 'Win rate', value: `${stats.winRate}%`, cls: '', sub: `${stats.wins} W · ${stats.total - stats.wins} L` },
             { label: 'Avg winner', value: fmt(stats.avgWin), cls: 'pnl-positive', sub: `Loser ${stats.avgLoss !== 0 ? fmt(stats.avgLoss) : '—'}` },
             { label: 'Profit factor', value: stats.profitFactor, cls: '', sub: `Expect. $${stats.expectancy}` },
-          ].map(({ label, value, cls, sub }) => (
+            { label: 'Max Drawdown', value: `-$${stats.maxDD.toFixed(0)}`, cls: 'pnl-negative', sub: '' },
+            { label: 'Best Trade', value: fmt(stats.bestTrade), cls: 'pnl-positive', sub: '' },
+            { label: 'Max Win Streak', value: `${stats.maxWinStreak}`, cls: '', sub: 'consecutive wins' },
+            { label: 'Max Loss Streak', value: `${stats.maxLossStreak}`, cls: '', sub: 'consecutive losses' },
+            { label: 'Total Trades', value: stats.total, cls: '', sub: `${stats.wins}W · ${stats.total - stats.wins}L` },
+            ].map(({ label, value, cls, sub }) => (
             <div key={label} className="stat-card">
               <div style={{ fontSize: 13, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
               <div className={cls} style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>{value}</div>
