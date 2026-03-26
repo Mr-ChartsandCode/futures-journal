@@ -338,6 +338,10 @@ async function fetchEconAlerts() {
     const now = new Date()
     const oneHour = 60 * 60 * 1000
 
+// Market close — 1600 EST
+const marketClose = new Date()
+marketClose.setHours(14, 0, 0, 0) // mst
+
     const G20_CURRENCIES = new Set([
   'USD','EUR','GBP','JPY','CAD','AUD','CNY','CNH','INR','BRL',
   'KRW','MXN','RUB','ZAR','TRY','SAR','ARS','IDR','CHF','SGD'
@@ -345,18 +349,16 @@ async function fetchEconAlerts() {
 
 return (Array.isArray(data) ? data : [])
   .filter(e => {
-    if (!G20_CURRENCIES.has(e.country)) return false
-    if (e.impact !== 'High' && e.impact !== 'Medium') return false
-    const eventTime = new Date(e.date)
-    const diff = eventTime - now
-    return diff >= -oneHour && diff <= oneHour * 8
-  })
+  if (!G20_CURRENCIES.has(e.country)) return false
+  if (e.impact !== 'High' && e.impact !== 'Medium') return false
+  const eventTime = new Date(e.date)
+  return eventTime <= now && now <= marketClose
+})
       .map(e => {
         const eventTime = new Date(e.date)
-        const isFuture = eventTime > now
-        const headline = isFuture
-          ? `⚡ UPCOMING: ${e.title} — releases at ${eventTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
-          : `⚡ RELEASED: ${e.title}${e.actual ? ` — Actual: ${e.actual}` : ''}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
+        const headline = `⚡ ${e.title} (${e.country}) — Released ${eventTime.toLocaleTimeString('en-US', 
+          { hour: 'numeric', minute: '2-digit' })}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}
+          ${e.previous ? ` | Previous: ${e.previous}` : ''}`
         return {
           id: `econ-${e.title}-${e.date}`,
           headline,
@@ -389,7 +391,7 @@ export default async function handler(req, res) {
 
     const batchResults = await Promise.allSettled(
       batches.map(async batch => {
-        const symbols = batch.join(',')
+        const symbols = batch.map(t => t.symbol).join(',')
         const r = await fetch(
           `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbols}&fields=symbol,shortName,regularMarketChangePercent,regularMarketPrice,regularMarketChange`,
           { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36' } }
