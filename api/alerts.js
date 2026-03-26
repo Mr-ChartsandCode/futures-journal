@@ -365,7 +365,7 @@ async function fetchEconAlerts() {
           summary: `${e.country} economic event.${e.forecast ? ` Forecast: ${e.forecast}.` : ''}${e.previous ? ` Previous: ${e.previous}.` : ''}${e.actual ? ` Actual: ${e.actual}.` : ''}`,
           source: 'ECON ALERT',
           category: 'Alert',
-          created_at: e.date,
+          created_at: new Date().toISOString(),
           isAlert: true,
           alertType: 'economic',
           changePct: 0,
