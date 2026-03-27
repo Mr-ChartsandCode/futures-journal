@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 const QUICK_ACTIONS = [
-  { label: '📊 Daily Briefing', prompt: 'Give me a complete daily trading briefing. Analyze my recent performance, identify what\'s working and what\'s not, and tell me what to focus on today.' },
-  { label: '🔍 Find My Patterns', prompt: 'Analyze my trade history deeply. What patterns do you see? Which setups should I keep, which should I cut, and when am I trading at my best vs worst?' },
-  { label: '📈 Score My Setups', prompt: 'Score each of my setup tags on a 1-10 scale across: entry quality, stop placement, target selection, and R:R. Be brutally honest.' },
-  { label: '⚡ Performance Killers', prompt: 'What is costing me the most money? Identify my top 3 performance killers with specific data from my trades and actionable fixes.' },
-  { label: '🧠 Psychology Check', prompt: 'Analyze how my emotions affect my trading. When do I trade best and worst emotionally? What patterns do you see?' },
-  { label: '📅 Week Ahead', prompt: 'What high impact economic events are coming this week and how should I position my trading around them?' },
+  { label: '📊 Analyze My Chart', prompt: 'Attach a chart screenshot and I\'ll break down the setup, key levels, and whether I\'d take the trade.' },
+  { label: '📈 Best ES Setups', prompt: 'What are the highest probability ES setups to trade during the NY session? Walk me through entry, stop, and target for each.' },
+  { label: '⚡ VWAP Strategies', prompt: 'Give me your best VWAP-based trading strategies for ES and NQ futures. Entry criteria, stop placement, and targets.' },
+  { label: '🎯 Opening Range', prompt: 'Break down the opening range breakout strategy for ES futures. What makes a valid breakout vs a fake?' },
+  { label: '🧠 Trading Psychology', prompt: 'What are the most common psychological mistakes futures traders make and how do I fix them?' },
+  { label: '📅 Market Structure', prompt: 'Explain how to read market structure in ES futures — higher highs, lower lows, and how to trade with the trend.' },
 ]
 
 function Message({ msg }) {
@@ -63,19 +63,10 @@ export default function AIAssistant() {
   }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [includeTradeContext, setIncludeTradeContext] = useState(true)
-  const [includeNewsContext, setIncludeNewsContext] = useState(true)
   const [pendingImage, setPendingImage] = useState(null)
-  const [userId, setUserId] = useState(null)
   const bottomRef = useRef(null)
   const fileRef = useRef(null)
   const textareaRef = useRef(null)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data?.user) setUserId(data.user.id)
-    })
-  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -100,11 +91,8 @@ export default function AIAssistant() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: apiMessages,
-          userId,
-          includeTradeContext,
-          includeNewsContext,
-          image: image || null,
+        messages: apiMessages,
+        image: image || null,
         })
       })
 
@@ -145,18 +133,6 @@ export default function AIAssistant() {
             AI Trading Coach
           </span>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => setIncludeTradeContext(p => !p)} style={{
-              fontSize: 14, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
-              fontFamily: 'var(--font)', letterSpacing: '0.04em', border: 'none',
-              background: includeTradeContext ? '#001428' : '#111',
-              color: includeTradeContext ? '#70c0ff' : '#555',
-            }}>📊 TRADE DATA {includeTradeContext ? 'ON' : 'OFF'}</button>
-            <button onClick={() => setIncludeNewsContext(p => !p)} style={{
-              fontSize: 14, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
-              fontFamily: 'var(--font)', letterSpacing: '0.04em', border: 'none',
-              background: includeNewsContext ? '#001428' : '#111',
-              color: includeNewsContext ? '#70c0ff' : '#555',
-            }}>📰 NEWS {includeNewsContext ? 'ON' : 'OFF'}</button>
           </div>
         </div>
         <button onClick={() => setMessages([{
