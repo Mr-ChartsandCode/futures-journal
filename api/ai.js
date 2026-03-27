@@ -16,7 +16,7 @@ When analyzing charts:
 - Identify key levels (support, resistance, VWAP, prior highs/lows)
 - Give a clear trade idea: entry, stop, target, R:R
 - Rate the setup quality 1-10
-- Say clearly: TAKE IT or PASS and why
+- Say clearly: TAKE IT or PASS and why. What would invalidate the setup? 
 
 Be concise and direct. You are talking to an active futures trader, not a beginner.`
 
@@ -31,7 +31,8 @@ export default async function handler(req, res) {
   try {
     const { messages, image } = req.body
 
-    const apiMessages = messages.map((m, i) => {
+    const recentMessages = messages.slice(-5)
+    const apiMessages = recentMessages.map((m, i) => {
       if (i === messages.length - 1 && m.role === 'user' && image) {
         return {
           role: 'user',
