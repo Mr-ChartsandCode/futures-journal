@@ -11,6 +11,18 @@ function timeAgo(dateStr) {
   return `${days}d ago`
 }
 
+function sourceColor(source) {
+  const s = (source || '').toUpperCase()
+  if (s.includes('CNBC'))        return { color: '#ff4444', bg: '#1a0000', border: '#600000' }
+  if (s.includes('AL JAZEERA'))  return { color: '#ff8c00', bg: '#1a0800', border: '#603000' }
+  if (s.includes('REUTERS'))     return { color: '#ff6b35', bg: '#1a0a00', border: '#602000' }
+  if (s.includes('AP'))          return { color: '#cc4444', bg: '#180000', border: '#500000' }
+  if (s.includes('POLITICO'))    return { color: '#a070ff', bg: '#0e0018', border: '#400080' }
+  if (s.includes('NOTUS'))       return { color: '#40c0aa', bg: '#001a16', border: '#006050' }
+  if (s.includes('COMMODITIES')) return { color: '#ffd700', bg: '#1a1400', border: '#605000' }
+  if (s.includes('GOOGLE'))      return { color: '#70c0ff', bg: '#001428', border: '#003080' }
+  return                                { color: '#70c0ff', bg: '#001428', border: '#003080' }
+}
 
 export default function NewsFeed() {
   const [articles, setArticles] = useState([])
@@ -106,7 +118,7 @@ export default function NewsFeed() {
                         ⚡ ALERT
                       </span>
                     ) : (
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#0a0a1a', color: '#70c0ff', border: '1px solid #003080', letterSpacing: '0.06em', flexShrink: 0 }}>
+                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: sourceColor(article.source).bg, color: sourceColor(article.source).color, border: `1px solid ${sourceColor(article.source).border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
                         {article.source?.toUpperCase()}
                       </span>
                     )}
