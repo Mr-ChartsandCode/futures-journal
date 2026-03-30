@@ -32,6 +32,27 @@ const EARNINGS_JUNK = [
   'earnings options', 'earnings play',
 ]
 
+const AJ_REQUIRED = [
+  'explosion','exploded','strike','airstrike','air strike','missile','attack',
+  'blast','bombed','bombing','killed','dead','troops','military','forces',
+  'pipeline','oil field','tanker','port','blockade','naval','warship',
+  'isis','isil','daesh','houthi','hezbollah','hamas military','rocket fire',
+  'war','combat','frontline','offensive','invasion','seized','captured',
+  'power plant','infrastructure attack','refinery attack','drone strike',
+  'weapon','ammunition','artillery','mortar','raid',
+]
+
+const AJ_JUNK = [
+  'law passed','legislation','court','ruling','verdict','sentenced',
+  'protest','demonstration','march','rally','activist',
+  'election','vote','poll','political','parliament','minister',
+  'rights','discrimination','apartheid','settlement','occupied',
+  'cultural','heritage','museum','art','film','music',
+  'aid','humanitarian','refugee','asylum','migrant',
+  'speech','statement','comments','says','urges','calls for',
+  'condemned','criticized','accused','blamed',
+]
+
 const MEGA_CAP_TICKERS = new Set([
   'AAPL','MSFT','NVDA','AMZN','GOOGL','GOOG','META','TSLA',
   'JPM','V','UNH','XOM','JNJ','WMT','MA','PG','HD','CVX',
@@ -112,6 +133,15 @@ const ALWAYS_PASS = [
   'export data','import data','trade balance','current account',
   'sovereign debt','debt crisis','currency crisis','capital flight',
   'rate decision','central bank decision','monetary policy',
+  // wartime
+  'explosion','exploded','airstrike','air strike','missile strike',
+  'pipeline explosion','oil field','tanker attacked','port blockade',
+  'houthi','drone strike','refinery','naval blockade','warship',
+  'isis attack','isil','daesh attack','combat','frontline',
+  'lng supply','gas supply','coal supply','commodity supply',
+  'biotech deal','drug development deal','billion deal','signs deal',
+  'production starts','starts production','begins production',
+  'supply disruption','supply chain shock','energy supply',
 ]
 
 function isJunk(headline) {
@@ -134,6 +164,11 @@ function isEarningsJunk(headline) {
 
 function categorize(text) {
   const t = text.toLowerCase()
+  // Al Jazeera shocks are always Geopolitical
+  if (t.includes('explosion') || t.includes('airstrike') || t.includes('missile') ||
+      t.includes('houthi') || t.includes('isis') || t.includes('blast') ||
+      t.includes('pipeline') && (t.includes('attack') || t.includes('explod')))
+    return 'Geopolitical'
   const earningsSignals = [
     'earnings beat','earnings miss','reported earnings','quarterly results',
     'q1 results','q2 results','q3 results','q4 results','full year results',
@@ -189,6 +224,14 @@ export default async function handler(req, res) {
 
           if (!title) continue
           if (isJunk(title)) continue
+          // Al Jazeera — only military/infrastructure shocks
+          if (feed.label === 'Al Jazeera') {
+            const text = (title + ' ' + cleanDesc).toLowerCase()
+            const hasShock = AJ_REQUIRED.some(k => text.includes(k))
+            const hasJunk = AJ_JUNK.some(k => text.includes(k))
+            if (!hasShock || hasJunk) continue
+          }
+
           if (!isRelevant(title, cleanDesc)) continue
 
           const cat = categorize(title + ' ' + cleanDesc)
