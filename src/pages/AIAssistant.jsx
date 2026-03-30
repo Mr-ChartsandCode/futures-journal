@@ -1,3 +1,12 @@
+// AI Assistant token saving measures:
+
+// Be specific in prompts — "analyze this ES 5min chart from today's open" gets a better answer than "what do you think"
+// Include context in your message — tell it the timeframe, session, and what you were thinking. The AI can't see your platform settings.
+// Challenge its analysis — if it says TAKE IT, ask "what would invalidate this setup?" Forces sharper thinking.
+// Use it pre-trade — screenshot your setup before entering and ask "would you take this?" Good discipline tool.
+// One topic per chat — psychology questions, chart analysis, and market structure should each be their own chat session for cleaner more focused answers.
+// Ask for a score — end every chart analysis request with "rate this setup 1-10" so you get a consistent framework over time.
+
 import { useState, useRef, useEffect } from 'react'
 import { useTrades } from '../hooks/useTrades'
 import { useNavigate } from 'react-router-dom'

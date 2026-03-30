@@ -1,13 +1,12 @@
 const FEEDS = [
-  { url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html', label: 'CNBC' },
   { url: 'https://www.cnbc.com/id/10000664/device/rss/rss.html', label: 'CNBC Markets' },
-  { url: 'https://www.cnbc.com/id/10001147/device/rss/rss.html', label: 'CNBC World' },
-  { url: 'https://news.google.com/rss/search?q=federal+reserve+OR+inflation+OR+oil+price+OR+war+OR+sanctions+OR+earnings+OR+GDP+OR+interest+rates+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google News' },
-  { url: 'https://news.google.com/rss/search?q=S%26P500+OR+nasdaq+OR+dow+jones+OR+treasury+yields+OR+crude+oil+OR+OPEC+OR+gold+price+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Markets' },
-  { url: 'https://news.google.com/rss/search?q=china+economy+OR+russia+sanctions+OR+iran+OR+ukraine+war+OR+trump+tariff+OR+geopolitical+risk+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Geo' },
-  { url: 'https://news.google.com/rss/search?q=federal+reserve+chair+OR+treasury+secretary+OR+white+house+policy+OR+congress+bill+OR+executive+order+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Policy' },
-  { url: 'https://news.google.com/rss/search?q=fed+chair+OR+press+secretary+OR+senate+vote+OR+house+vote+OR+new+regulation+OR+deregulation+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Politics' },
-]
+  { url: 'https://rss.politico.com/energy.xml', label: 'Politico Energy' },
+  { url: 'https://rss.politico.com/defense.xml', label: 'Politico Defense'},
+  { url: 'https://rss.politico.com/congress.xml', label: ' Politico Congress'},
+  { url: 'https://www.aljazeera.com/xml/rss/all.xml', label: 'Al Jazeera' },
+  { url: 'https://www.notus.org/index.rss', label: 'NOTUS' },
+  { url: 'https://news.google.com/rss/search?q=commodities+oil+gas+coal+copper+gold+supply+disruption+pipeline+LNG+OPEC+production+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Commodities' },
+  { url: 'https://news.google.com/rss/search?q=(china+OR+japan+OR+germany+OR+UK+OR+france+OR+india+OR+brazil+OR+canada+OR+australia+OR+south+korea)+AND+(economy+OR+GDP+OR+inflation+OR+"interest+rate"+OR+"central+bank"+OR+"trade+deal"+OR+tariff+OR+recession+OR+currency+OR+bond+OR+"rate+decision"+OR+exports+OR+"trade+deficit")+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google International' },]
 
 const JUNK_PHRASES = [
   'invested in', 'years ago would', 'would be worth', 'if you invested',
@@ -24,7 +23,7 @@ const JUNK_PHRASES = [
   'crypto', 'bitcoin', 'ethereum', 'nft', 'defi', 'dogecoin', 'altcoin',
   'benzinga', 'motley fool', 'seeking alpha',
   'quiz', 'crossword', 'podcast', 'listen now', 'watch now',
-  'photos', 'video:', 'gallery',
+  'photos', 'video:', 'gallery', ' democrats', 'republicans',
 ]
 
 const EARNINGS_JUNK = [
@@ -101,6 +100,18 @@ const ALWAYS_PASS = [
   'donald trump', 'trump speaks', 'trump press',
   'fed governor', 'fed president speaks', 'fomc member speaks',
   'press conference', 'live now', 'speaking now', 'remarks',
+  // international
+  'bank of england','bank of japan','boj rate','boe rate','ecb rate',
+  'pboc','peoples bank of china','reserve bank of australia','rba',
+  'bank of canada','boc rate','bundesbank',
+  'g20','g7','imf forecast','world bank forecast','oecd',
+  'german gdp','uk gdp','japan gdp','china gdp','india gdp',
+  'uk inflation','eu inflation','japan inflation','china inflation',
+  'yuan','renminbi','yen','pound sterling','aussie dollar','canadian dollar',
+  'emerging markets','developing economies','global trade',
+  'export data','import data','trade balance','current account',
+  'sovereign debt','debt crisis','currency crisis','capital flight',
+  'rate decision','central bank decision','monetary policy',
 ]
 
 function isJunk(headline) {
