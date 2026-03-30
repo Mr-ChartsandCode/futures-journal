@@ -6,7 +6,10 @@ const FEEDS = [
   { url: 'https://www.aljazeera.com/xml/rss/all.xml', label: 'Al Jazeera' },
   { url: 'https://www.notus.org/index.rss', label: 'NOTUS' },
   { url: 'https://news.google.com/rss/search?q=commodities+oil+gas+coal+copper+gold+supply+disruption+pipeline+LNG+OPEC+production+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google Commodities' },
-  { url: 'https://news.google.com/rss/search?q=(china+OR+japan+OR+germany+OR+UK+OR+france+OR+india+OR+brazil+OR+canada+OR+australia+OR+south+korea)+AND+(economy+OR+GDP+OR+inflation+OR+"interest+rate"+OR+"central+bank"+OR+"trade+deal"+OR+tariff+OR+recession+OR+currency+OR+bond+OR+"rate+decision"+OR+exports+OR+"trade+deficit")+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Google International' },]
+  { url: 'https://news.google.com/search?q=site%3Areuters.com%20world&hl=en-US&gl=US&ceid=US%3Aen&output=rss', label: 'Reuters International' },
+  { url: 'https://news.google.com/search?q=site%3Ahttps%3A%2F%2Fapnews.com%20business&hl=en-US&gl=US&ceid=US%3Aen&output=rss', label: 'AP Business'}
+]
+
 
 const JUNK_PHRASES = [
   'invested in', 'years ago would', 'would be worth', 'if you invested',
@@ -23,7 +26,8 @@ const JUNK_PHRASES = [
   'crypto', 'bitcoin', 'ethereum', 'nft', 'defi', 'dogecoin', 'altcoin',
   'benzinga', 'motley fool', 'seeking alpha',
   'quiz', 'crossword', 'podcast', 'listen now', 'watch now',
-  'photos', 'video:', 'gallery', ' democrats', 'republicans',
+  'photos', 'video:', 'gallery', ' democrats', 'republicans', 'pope', 'god', 'players', 'games',
+  'transgender', 'athletes', 'prayers', 'score', 'fan', 'stadium', 'world cup', 'playoff',
 ]
 
 const EARNINGS_JUNK = [
