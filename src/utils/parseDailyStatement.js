@@ -42,8 +42,24 @@ export function parseDailyStatement(text) {
   }
 
   // Extract fees
-  const feesMatch = text.match(/TOTAL COMMISSION & FEES\s+([\d.]+)\s+DR/)
-  const totalFees = feesMatch ? parseFloat(feesMatch[1]) : 0
+  // Try multiple fee patterns
+    const feesMatch = text.match(/TOTAL COMMISSION & FEES\s+([\d.]+)\s+DR/) ||
+        text.match(/TOTAL COMMISSION[^$\d]*([\d.]+)\s+DR/) ||
+        text.match(/COMMISSION\s+USD\s+([\d.]+)\s+DR/)
+
+    // Also sum up individual fee lines as fallback
+    const exchangeMatch = text.match(/Exchange\s+USD\s+([\d.]+)\s+DR/i)
+    const nfaMatch = text.match(/NFA\s+USD\s+([\d.]+)\s+DR/i)
+    const clearingMatch = text.match(/Clearing[^\d]*([\d.]+)\s+DR/i)
+    const commMatch = text.match(/Commission\s+USD\s+([\d.]+)\s+DR/i)
+
+    const summedFees = [exchangeMatch, nfaMatch, clearingMatch, commMatch]
+    .filter(Boolean)
+    .reduce((s, m) => s + parseFloat(m[1]), 0)
+
+    const totalFees = feesMatch
+    ? parseFloat(feesMatch[1])
+    : summedFees > 0 ? summedFees : 0
 
   // Extract avg long / avg short
   const avgLongMatch = text.match(/AVERAGE LONG\s+([\d.]+)/)
