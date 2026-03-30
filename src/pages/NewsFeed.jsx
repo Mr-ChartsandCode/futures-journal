@@ -65,7 +65,7 @@ export default function NewsFeed() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 10, color: '#888', letterSpacing: '0.05em' }}>
-            {filtered.length} STORIES · 90s REFRESH
+            {filtered.length} STORIES · AUTO REFRESH
           </span>
           <button onClick={fetchNews} style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
             ↻ REFRESH
@@ -89,7 +89,6 @@ export default function NewsFeed() {
             </div>
           )}
           {filtered.map(article => {
-            const { color, bg, border } = categoryColor(article.category)
             const isLive = Date.now() - new Date(article.created_at).getTime() < 300000
             return (
               <div key={article.id} style={{
