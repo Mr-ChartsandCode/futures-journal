@@ -3,6 +3,8 @@ import { useTrades } from '../hooks/useTrades'
 import { useMemo, useState } from 'react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWeekend } from 'date-fns'
+import ImportPDF from '../components/ImportPDF'
+import { supabase } from '../lib/supabase'
 
 const tip = {
   contentStyle: { background: '#0c0c1e', border: '1px solid #2a2a4a', borderRadius: 6, fontSize: 15, boxShadow: '0 4px 20px rgba(0,0,20,0.8)' },
@@ -158,6 +160,25 @@ export default function Dashboard() {
 
   const fmt = (n) => `${n >= 0 ? '+' : '-'}$${Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
+  async function handlePDFImport(trades) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    for (const trade of trades) {
+      await supabase.from('trades').insert({
+        user_id: user.id,
+        trade_date: trade.trade_date,
+        instrument: trade.instrument,
+        direction: trade.direction,
+        contracts: trade.contracts,
+        entry_price: trade.entry_price,
+        exit_price: trade.exit_price,
+        pnl: trade.pnl,
+        notes: trade.notes,
+      })
+    }
+    window.location.reload()
+  }
+
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 16px' }}>
 
@@ -171,6 +192,7 @@ export default function Dashboard() {
               <button key={p} onClick={() => setPeriod(p)} className={period === p ? 'tab-active' : 'tab-inactive'}>{p}</button>
             ))}
           </div>
+          <ImportPDF onImport={handlePDFImport} />
           <button className="btn-primary" onClick={() => navigate('/add')} style={{ padding: '6px 14px' }}>+ NEW TRADE</button>
         </div>
       </div>
