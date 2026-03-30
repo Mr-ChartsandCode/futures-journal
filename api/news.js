@@ -5,9 +5,9 @@ const FEEDS = [
   { url: 'https://rss.politico.com/congress.xml', label: ' Politico Congress'},
   { url: 'https://www.aljazeera.com/xml/rss/all.xml', label: 'Al Jazeera' },
   { url: 'https://www.notus.org/index.rss', label: 'NOTUS' },
-  { url: 'https://news.google.com/rss/search?q=commodities+oil+gas+coal+copper+gold+supply+disruption+pipeline+LNG+OPEC+production+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Commodities' },
-  { url: 'https://news.google.com/search?q=site%3Areuters.com%20world&hl=en-US&gl=US&ceid=US%3Aen&output=rss', label: 'Reuters International' },
-  { url: 'https://news.google.com/search?q=site%3Ahttps%3A%2F%2Fapnews.com%20business&hl=en-US&gl=US&ceid=US%3Aen&output=rss', label: 'AP Business'}
+  { url: 'https://news.google.com/rss/search?q=commodities+oil+gas+coal+copper+gold+LNG+OPEC+supply+disruption+pipeline+when:1d&hl=en-US&gl=US&ceid=US:en', label: 'Commodities' },
+  { url: 'https://news.google.com/rss/search?q=site:reuters.com+world+economy+markets+trade&hl=en-US&gl=US&ceid=US:en', label: 'Reuters International' },
+  { url: 'https://news.google.com/rss/search?q=site:apnews.com+business+economy+markets&hl=en-US&gl=US&ceid=US:en', label: 'AP Business' },
 ]
 
 

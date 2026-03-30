@@ -1,7 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
 
-const CATEGORIES = ['All', 'Markets', 'Geopolitical', 'Earnings', 'Alert']
-
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
@@ -13,20 +11,10 @@ function timeAgo(dateStr) {
   return `${days}d ago`
 }
 
-function categoryColor(cat) {
-  switch (cat) {
-    case 'Markets':      return { color: '#70c0ff', bg: '#001428', border: '#003080' }
-    case 'Geopolitical': return { color: '#ffaa40', bg: '#1a0e00', border: '#604000' }
-    case 'Earnings':     return { color: '#a070ff', bg: '#0e0018', border: '#400080' }
-    case 'Alert':        return { color: '#ff4444', bg: '#1a0000', border: '#600000' }
-    default:             return { color: '#888',    bg: '#111',    border: '#333'    }
-  }
-}
 
 export default function NewsFeed() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
-  const [category, setCategory] = useState('All')
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
 
@@ -64,9 +52,7 @@ export default function NewsFeed() {
     return () => clearInterval(intervalRef.current)
   }, [])
 
-  const filtered = category === 'All'
-    ? articles
-    : articles.filter(a => a.category === category)
+  const filtered = articles
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', fontFamily: 'var(--font)' }}>
@@ -76,22 +62,6 @@ export default function NewsFeed() {
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#f0f0f0' }}>
             News Wire
           </span>
-          <div style={{ display: 'flex', gap: 4 }}>
-            {CATEGORIES.map(cat => {
-              const { color, bg, border } = categoryColor(cat)
-              const active = category === cat
-              return (
-                <button key={cat} onClick={() => setCategory(cat)} style={{
-                  fontSize: 11, padding: '4px 10px', borderRadius: 4, cursor: 'pointer',
-                  fontFamily: 'var(--font)', letterSpacing: '0.04em', fontWeight: active ? 700 : 400,
-                  background: active ? (cat === 'All' ? 'var(--blue-dim)' : bg) : 'transparent',
-                  color: active ? (cat === 'All' ? 'var(--blue-text)' : color) : '#888',
-                  border: active ? `1px solid ${cat === 'All' ? '#003080' : border}` : '1px solid transparent',
-                  transition: 'all 0.15s',
-                }}>{cat}</button>
-              )
-            })}
-          </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 10, color: '#888', letterSpacing: '0.05em' }}>
@@ -132,22 +102,22 @@ export default function NewsFeed() {
               }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7 }}>
-                    {!article.isAlert && (
-  <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: bg, color, border: `1px solid ${border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
-      {article.category.toUpperCase()}
-    </span>
-)}
                     {article.isAlert ? (
                       <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         ⚡ ALERT
                       </span>
-                    ) : isLive && !article.isAlert && (
+                    ) : (
+                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#0a0a1a', color: '#70c0ff', border: '1px solid #003080', letterSpacing: '0.06em', flexShrink: 0 }}>
+                        {article.source?.toUpperCase()}
+                      </span>
+                    )}
+                    {isLive && !article.isAlert && (
                       <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         LIVE
                       </span>
                     )}
                     <span style={{ fontSize: 11, color: '#666' }}>
-                      {article.source?.toUpperCase()} · {timeAgo(article.created_at)}
+                      {timeAgo(article.created_at)}
                     </span>
                   </div>
                   <div style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.5, color: '#f0f0f0' }}>
