@@ -8,56 +8,37 @@ export default function ImportPDF({ onImport }) {
   const fileRef = useRef(null)
 
   async function handleFile(file) {
-    if (!file || file.type !== 'application/pdf') {
-      setError('Please select a PDF file')
-      return
-    }
-    setLoading(true)
-    setError(null)
-    setPreview(null)
-
-    try {
-      // Load PDF.js
-      const pdfjsLib = await import('pdfjs-dist')
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@5.6.205/build/pdf.worker.min.mjs'
-
-      const arrayBuffer = await file.arrayBuffer()
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
-
-      let fullText = ''
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i)
-        const content = await page.getTextContent()
-        const strings = []
-        for (let j = 0; j < content.items.length; j++) {
-          const item = content.items[j]
-          if (item && typeof item.str === 'string') {
-            strings.push(item.str)
-          }
-        }
-        fullText += strings.join(' ') + '\n'
-      }
-
-      console.log('RAW PDF TEXT:', fullText)
-      let result
-      try {
-        result = parseDailyStatement(fullText)
-      } catch (parseErr) {
-        console.error('Parse error:', parseErr)
-        setError(`Parse error: ${parseErr.message}`)
-        setLoading(false)
-        return
-      }
-      if (result.error) {
-        setError(result.error)
-      } else {
-        setPreview(result)
-      }
-    } catch (err) {
-      setError(`Failed to parse PDF: ${err.message}`)
-    }
-    setLoading(false)
+  if (!file || file.type !== 'application/pdf') {
+    setError('Please select a PDF file')
+    return
   }
+  setLoading(true)
+  setError(null)
+  setPreview(null)
+
+  try {
+    // Send PDF to server-side parser instead
+    const formData = new FormData()
+    formData.append('pdf', file)
+
+    const res = await fetch('/api/parse-pdf', {
+      method: 'POST',
+      body: formData,
+    })
+
+    const data = await res.json()
+    if (data.error) {
+      setError(data.error)
+    } else if (!data.trades?.length) {
+      setError('No trades found in PDF')
+    } else {
+      setPreview(data)
+    }
+  } catch (err) {
+    setError(`Failed to parse PDF: ${err.message}`)
+  }
+  setLoading(false)
+}
 
   return (
     <div>
