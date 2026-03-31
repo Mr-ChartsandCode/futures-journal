@@ -108,7 +108,7 @@ export default async function handler(req, res) {
     if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
 
     // Use dynamic import for pdf-parse to avoid ESM issues
-    const { default: pdfParse } = await import('pdf-parse/lib/pdf-parse.js')
+    const { default: pdfParse } = await import('pdf-parse')
     const parsed = await pdfParse(pdfPart.data)
     const result = parseDailyStatement(parsed.text)
     res.status(200).json(result)
