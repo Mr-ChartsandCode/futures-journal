@@ -1,31 +1,6 @@
-const pdfParse = require('pdf-parse')
+export const config = { api: { bodyParser: false } }
 
-module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
-
-  try {
-    const rawBody = await getRawBody(req)
-    const contentType = req.headers['content-type'] || ''
-    const boundaryMatch = contentType.match(/boundary=(.+)/)
-    if (!boundaryMatch) return res.status(400).json({ error: 'No boundary found' })
-
-    const parts = parseMultipart(rawBody, boundaryMatch[1])
-    const pdfPart = parts.find(p => p.headers.includes('filename'))
-    if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
-
-    const parsed = await pdfParse(pdfPart.data)
-    const result = parseDailyStatement(parsed.text)
-    res.status(200).json(result)
-  } catch (err) {
-    console.error('PDF parse error:', err)
-    res.status(500).json({ error: err.message })
-  }
-}
-
-module.exports.config = { api: { bodyParser: false } }
-
-function getRawBody(req) {
+async function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = []
     req.on('data', chunk => chunks.push(chunk))
@@ -56,7 +31,6 @@ function parseMultipart(buffer, boundary) {
 }
 
 function parseDailyStatement(text) {
-  // Extract date
   let statementDate = null
   const dateMatch = text.match(/(\d{2}-[A-Z]{3}-\d{2,4})/)
   if (dateMatch) {
@@ -65,7 +39,6 @@ function parseDailyStatement(text) {
     const year = yr.length === 2 ? `20${yr}` : yr
     statementDate = `${year}-${months[mon]}-${day.padStart(2,'0')}`
   }
-
   if (!statementDate) return { trades: [], error: 'Could not find date in PDF' }
 
   const avgLongMatch = text.match(/AVERAGE LONG\s+([\d.]+)/)
@@ -77,7 +50,6 @@ function parseDailyStatement(text) {
   const totalPnl = pnlMatch
     ? (pnlMatch[2] === 'DR' ? -parseFloat(pnlMatch[1]) : parseFloat(pnlMatch[1]))
     : null
-
   if (totalPnl === null) return { trades: [], error: 'Could not find P&L in PDF' }
 
   const exchangeMatch = text.match(/Exchange\s+USD\s+([\d.]+)/i)
@@ -118,5 +90,30 @@ function parseDailyStatement(text) {
       notes: `Imported from daily statement. ${totalContracts} contract${totalContracts !== 1 ? 's' : ''}. Entry: ${entryPrice}, Exit: ${exitPrice}.`,
     }],
     fees: totalFees,
+  }
+}
+
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
+  try {
+    const rawBody = await getRawBody(req)
+    const contentType = req.headers['content-type'] || ''
+    const boundaryMatch = contentType.match(/boundary=(.+)/)
+    if (!boundaryMatch) return res.status(400).json({ error: 'No boundary found' })
+
+    const parts = parseMultipart(rawBody, boundaryMatch[1])
+    const pdfPart = parts.find(p => p.headers.includes('filename'))
+    if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
+
+    // Use dynamic import for pdf-parse to avoid ESM issues
+    const { default: pdfParse } = await import('pdf-parse/lib/pdf-parse.js')
+    const parsed = await pdfParse(pdfPart.data)
+    const result = parseDailyStatement(parsed.text)
+    res.status(200).json(result)
+  } catch (err) {
+    console.error('PDF parse error:', err)
+    res.status(500).json({ error: err.message })
   }
 }
