@@ -28,7 +28,14 @@ export default function ImportPDF({ onImport }) {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i)
         const content = await page.getTextContent()
-        fullText += content.items.map(item => item.str).join(' ') + '\n'
+        const strings = []
+        for (let j = 0; j < content.items.length; j++) {
+          const item = content.items[j]
+          if (item && typeof item.str === 'string') {
+            strings.push(item.str)
+          }
+        }
+        fullText += strings.join(' ') + '\n'
       }
 
       console.log('RAW PDF TEXT:', fullText)
