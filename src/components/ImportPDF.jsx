@@ -32,7 +32,16 @@ export default function ImportPDF({ onImport }) {
         fullText += content.items.map(item => item.str).join(' ') + '\n'
       }
 
-      const result = parseDailyStatement(fullText)
+      console.log('RAW PDF TEXT:', fullText)
+      let result
+      try {
+        result = parseDailyStatement(fullText)
+      } catch (parseErr) {
+        console.error('Parse error:', parseErr)
+        setError(`Parse error: ${parseErr.message}`)
+        setLoading(false)
+        return
+      }
       if (result.error) {
         setError(result.error)
       } else {
