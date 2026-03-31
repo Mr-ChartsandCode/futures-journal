@@ -1,12 +1,31 @@
-import { createRequire } from 'module'
-const require = createRequire(import.meta.url)
 const pdfParse = require('pdf-parse')
 
-export const config = {
-  api: { bodyParser: false }
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
+
+  try {
+    const rawBody = await getRawBody(req)
+    const contentType = req.headers['content-type'] || ''
+    const boundaryMatch = contentType.match(/boundary=(.+)/)
+    if (!boundaryMatch) return res.status(400).json({ error: 'No boundary found' })
+
+    const parts = parseMultipart(rawBody, boundaryMatch[1])
+    const pdfPart = parts.find(p => p.headers.includes('filename'))
+    if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
+
+    const parsed = await pdfParse(pdfPart.data)
+    const result = parseDailyStatement(parsed.text)
+    res.status(200).json(result)
+  } catch (err) {
+    console.error('PDF parse error:', err)
+    res.status(500).json({ error: err.message })
+  }
 }
 
-async function getRawBody(req) {
+module.exports.config = { api: { bodyParser: false } }
+
+function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = []
     req.on('data', chunk => chunks.push(chunk))
@@ -37,8 +56,6 @@ function parseMultipart(buffer, boundary) {
 }
 
 function parseDailyStatement(text) {
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
-
   // Extract date
   let statementDate = null
   const dateMatch = text.match(/(\d{2}-[A-Z]{3}-\d{2,4})/)
@@ -51,13 +68,11 @@ function parseDailyStatement(text) {
 
   if (!statementDate) return { trades: [], error: 'Could not find date in PDF' }
 
-  // Extract avg long/short
   const avgLongMatch = text.match(/AVERAGE LONG\s+([\d.]+)/)
   const avgShortMatch = text.match(/AVERAGE SHORT\s+([\d.]+)/)
   const avgLong = avgLongMatch ? parseFloat(avgLongMatch[1]) : null
   const avgShort = avgShortMatch ? parseFloat(avgShortMatch[1]) : null
 
-  // Extract P&L
   const pnlMatch = text.match(/P&S\s+USD\s+([\d.]+)\s+(DR|CR)/)
   const totalPnl = pnlMatch
     ? (pnlMatch[2] === 'DR' ? -parseFloat(pnlMatch[1]) : parseFloat(pnlMatch[1]))
@@ -65,7 +80,6 @@ function parseDailyStatement(text) {
 
   if (totalPnl === null) return { trades: [], error: 'Could not find P&L in PDF' }
 
-  // Extract fees by summing individual lines
   const exchangeMatch = text.match(/Exchange\s+USD\s+([\d.]+)/i)
   const nfaMatch = text.match(/NFA\s+USD\s+([\d.]+)/i)
   const clearingMatch = text.match(/Clearing[^\d]*([\d.]+)/i)
@@ -74,24 +88,17 @@ function parseDailyStatement(text) {
     .filter(Boolean)
     .reduce((s, m) => s + parseFloat(m[1]), 0)
 
-  // Extract contracts
   const totalMatch = text.match(/TOTAL\s+(\d+)\s+(\d+)/)
   const totalContracts = totalMatch ? parseInt(totalMatch[1]) : 1
 
-  // Extract instrument
   const instrMatch = text.match(/\b(MES|MNQ|MCL|MGC|ES|NQ|CL|GC|MYM|M2K)\b/)
   const instrument = instrMatch ? instrMatch[1] : 'MES'
 
-  // Direction — short if avg short > avg long (sold high, bought low = loss if price went up)
-  // Use P&L and price difference to determine
   let direction = 'long'
   if (avgLong && avgShort) {
-    // If we went short: entry=avgShort, exit=avgLong
-    // Short profit = (avgShort - avgLong) * contracts * pointValue
     const pointValue = instrument.startsWith('M') ? 5 : 50
     const longPnl = (avgShort - avgLong) * totalContracts * pointValue
     const shortPnl = (avgLong - avgShort) * totalContracts * pointValue
-    // Whichever is closer to actual P&L is the direction
     direction = Math.abs(longPnl - totalPnl) < Math.abs(shortPnl - totalPnl) ? 'long' : 'short'
   }
 
@@ -111,28 +118,5 @@ function parseDailyStatement(text) {
       notes: `Imported from daily statement. ${totalContracts} contract${totalContracts !== 1 ? 's' : ''}. Entry: ${entryPrice}, Exit: ${exitPrice}.`,
     }],
     fees: totalFees,
-  }
-}
-
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
-
-  try {
-    const rawBody = await getRawBody(req)
-    const contentType = req.headers['content-type'] || ''
-    const boundaryMatch = contentType.match(/boundary=(.+)/)
-    if (!boundaryMatch) return res.status(400).json({ error: 'No boundary found' })
-
-    const parts = parseMultipart(rawBody, boundaryMatch[1])
-    const pdfPart = parts.find(p => p.headers.includes('filename'))
-    if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
-
-    const parsed = await pdfParse(pdfPart.data)
-    const result = parseDailyStatement(parsed.text)
-    res.status(200).json(result)
-  } catch (err) {
-    console.error('PDF parse error:', err)
-    res.status(500).json({ error: err.message })
   }
 }
