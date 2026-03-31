@@ -19,8 +19,7 @@ export default function ImportPDF({ onImport }) {
     try {
       // Load PDF.js
       const pdfjsLib = await import('pdfjs-dist')
-      const workerUrl = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
-      pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@5.6.205/build/pdf.worker.min.mjs'
 
       const arrayBuffer = await file.arrayBuffer()
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
