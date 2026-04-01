@@ -168,7 +168,7 @@ async function fetchForexFactoryAlerts() {
       if (eventDateStr < ytdStart || eventDateStr > todayStr) continue
 
       const releaseTimeET = eventDate.toLocaleTimeString('en-US', {
-        hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'
+        hour: 'numeric', minute: '2-digit', timeZone: 'America/Denver'
       })
 
       let changeStr = ''
@@ -182,7 +182,7 @@ async function fetchForexFactoryAlerts() {
         }
       }
 
-      const headline = `⚡ ${e.title} — Actual: ${e.actual}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Prev: ${e.previous}` : ''}${changeStr} | Released ${releaseTimeET} ET`
+      const headline = `⚡ ${e.title} — Actual: ${e.actual}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Prev: ${e.previous}` : ''}${changeStr} | Released ${releaseTimeET}`
 
       alerts.push({
         id: `ff-${e.title}-${eventDateStr}`,
