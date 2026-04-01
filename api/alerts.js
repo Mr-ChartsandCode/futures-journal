@@ -367,51 +367,90 @@ function getReleaseTimestamp(short) {
   return new Date(`${past[0]}T${String(schedule.utcHour).padStart(2,'0')}:30:00.000Z`)
 }
 
-// Static alerts for non-BLS releases that happened this year
-function getStaticEconAlerts() {
-  const now = new Date()
-  const todayStr = now.toISOString().slice(0, 10)
-  const ytdStart = `${now.getFullYear()}-01-01`
-  const alerts = []
+const FRED_API_KEY = process.env.FRED_API_KEY || 'dd5072cf6263f1b382d0f02d471ad909'
 
-  const STATIC = [
-    { short: 'FOMC',      name: 'Fed Interest Rate Decision', source: 'FEDERAL RESERVE' },
-    { short: 'FOMC_MINUTES', name: 'FOMC Meeting Minutes',   source: 'FEDERAL RESERVE' },
-    { short: 'GDP',       name: 'GDP Growth Rate QoQ',        source: 'BEA' },
-    { short: 'PCE',       name: 'PCE Price Index MoM',        source: 'BEA' },
-    { short: 'COREPCE',   name: 'Core PCE Price Index MoM',   source: 'BEA' },
-    { short: 'PERSONAL_INCOME',   name: 'Personal Income MoM',   source: 'BEA' },
-    { short: 'PERSONAL_SPENDING', name: 'Personal Spending MoM',  source: 'BEA' },
-    { short: 'ISM_MFG',   name: 'ISM Manufacturing PMI',      source: 'ISM' },
-    { short: 'ISM_SVCS',  name: 'ISM Services PMI',           source: 'ISM' },
-    { short: 'DURABLE',   name: 'Durable Goods Orders MoM',   source: 'CENSUS' },
-    { short: 'EXISTING_HOME', name: 'Existing Home Sales',    source: 'NAR' },
-  ]
+// FRED series for non-BLS market-moving releases
+const FRED_SERIES = [
+  { id: 'PCEPILFE',          name: 'Core PCE Price Index MoM',   short: 'COREPCE',        source: 'BEA' },
+  { id: 'PCEPI',             name: 'PCE Price Index MoM',         short: 'PCE',            source: 'BEA' },
+  { id: 'PI',                name: 'Personal Income MoM',         short: 'PERSONAL_INCOME', source: 'BEA' },
+  { id: 'PCE',               name: 'Personal Spending MoM',       short: 'PERSONAL_SPENDING', source: 'BEA' },
+  { id: 'A191RL1Q225SBEA',   name: 'GDP Growth Rate QoQ',         short: 'GDP',            source: 'BEA' },
+  { id: 'DGORDER',           name: 'Durable Goods Orders MoM',    short: 'DURABLE',        source: 'CENSUS' },
+  { id: 'EXHOSLUSM495S',     name: 'Existing Home Sales',         short: 'EXISTING_HOME',  source: 'NAR' },
+  { id: 'NAPM',              name: 'ISM Manufacturing PMI',        short: 'ISM_MFG',        source: 'ISM' },
+  { id: 'NMFCI',             name: 'ISM Services PMI',             short: 'ISM_SVCS',       source: 'ISM' },
+  { id: 'FEDFUNDS',          name: 'Fed Interest Rate Decision',   short: 'FOMC',           source: 'FEDERAL RESERVE' },
+  { id: 'DPCCRV1M086SBEA',   name: 'Core PCE MoM % Change',       short: 'COREPCE_PCT',    source: 'BEA' },
+]
 
-  for (const item of STATIC) {
-    const ts = getReleaseTimestamp(item.short)
-    if (!ts) continue
-    const releaseDateStr = ts.toISOString().slice(0, 10)
-    if (releaseDateStr < ytdStart || releaseDateStr > todayStr) continue
+async function fetchFREDAlerts() {
+  try {
+    const now = new Date()
+    const todayStr = now.toISOString().slice(0, 10)
+    const ytdStart = `${now.getFullYear()}-01-01`
+    const alerts = []
 
-    const releaseTimeET = ts.toLocaleTimeString('en-US', {
-      hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'
-    })
+    await Promise.allSettled(FRED_SERIES.map(async (series) => {
+      try {
+        const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${series.id}&api_key=${FRED_API_KEY}&file_type=json&sort_order=desc&limit=3&observation_start=${ytdStart}`
+        const r = await fetch(url, { signal: AbortSignal.timeout(6000) })
+        if (!r.ok) return
 
-    alerts.push({
-      id: `static-${item.short}-${releaseDateStr}`,
-      headline: `⚡ ${item.name} — Released ${releaseTimeET} ET`,
-      summary: `${item.name} released today at ${releaseTimeET} ET.`,
-      source: item.source,
-      category: 'Alert',
-      created_at: ts.toISOString(),
-      isAlert: true,
-      alertType: 'economic',
-      changePct: 0,
-    })
+        const data = await r.json()
+        const obs = data.observations?.filter(o => o.value !== '.' && o.date >= ytdStart)
+        if (!obs?.length) return
+
+        const latest = obs[0]
+        const previous = obs[1]
+
+        const releaseDate = latest.date
+        if (releaseDate > todayStr) return
+
+        const releaseTime = getReleaseTimestamp(series.short)
+        const releaseTS = releaseTime || new Date(`${releaseDate}T13:30:00.000Z`)
+
+        const releaseTimeET = releaseTS.toLocaleTimeString('en-US', {
+          hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'
+        })
+
+        const actual = parseFloat(latest.value)
+        const prev = previous ? parseFloat(previous.value) : null
+
+        let changeStr = ''
+        if (prev !== null && !isNaN(prev) && !isNaN(actual)) {
+          const change = actual - prev
+          const sign = change >= 0 ? '+' : ''
+          changeStr = ` | Chg: ${sign}${change.toFixed(2)}`
+        }
+
+        const periodLabel = new Date(releaseDate + 'T12:00:00').toLocaleDateString('en-US', {
+          month: 'short', year: 'numeric'
+        })
+
+        const headline = `⚡ ${series.name} — ${periodLabel} | Actual: ${actual}${prev !== null ? ` | Prev: ${prev}` : ''}${changeStr} | Released ${releaseTimeET} ET`
+
+        alerts.push({
+          id: `fred-${series.id}-${releaseDate}`,
+          headline,
+          summary: `${series.name} for ${periodLabel}. Actual: ${actual}.${prev !== null ? ` Previous: ${prev}.` : ''}`,
+          source: series.source,
+          category: 'Alert',
+          created_at: releaseTS.toISOString(),
+          isAlert: true,
+          alertType: 'economic',
+          changePct: 0,
+        })
+      } catch (e) {
+        console.error(`FRED ${series.id} error:`, e.message)
+      }
+    }))
+
+    return alerts
+  } catch (err) {
+    console.error('FRED fetch error:', err)
+    return []
   }
-
-  return alerts
 }
 
 async function fetchBLSAlerts() {
@@ -551,19 +590,19 @@ export default async function handler(req, res) {
       }
     }
 
-    const [blsAlerts, staticAlerts] = await Promise.all([
+    const [blsAlerts, fredAlerts] = await Promise.all([
       fetchBLSAlerts(),
-      Promise.resolve(getStaticEconAlerts()),
+      fetchFREDAlerts(),
     ])
 
-    // Dedupe static vs BLS — BLS wins if both exist for same release
-    const blsIds = new Set(blsAlerts.map(a => a.id))
-    const dedupedStatic = staticAlerts.filter(a => {
-      const short = a.id.split('-')[1]
-      return !blsAlerts.some(b => b.id.includes(short))
+    // Dedupe — BLS wins over FRED if both cover same indicator
+    const blsShorts = new Set(BLS_SERIES.map(s => s.short))
+    const dedupedFred = fredAlerts.filter(a => {
+      const short = FRED_SERIES.find(s => a.id.includes(s.id))?.short
+      return !short || !blsShorts.has(short)
     })
 
-    const allAlerts = [...blsAlerts, ...dedupedStatic, ...alerts]
+    const allAlerts = [...blsAlerts, ...dedupedFred, ...alerts]
     allAlerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     res.status(200).json({ alerts: allAlerts, count: allAlerts.length })
   } catch (err) {
