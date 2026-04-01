@@ -108,9 +108,23 @@ export default async function handler(req, res) {
     if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
 
     // Use dynamic import for pdf-parse to avoid ESM issues
-const { default: pdfParse } = await import('pdf-parse/lib/pdf-parse.js').catch(() => import('pdf-parse'))    
-const result = parseDailyStatement(parsed.text)
-    res.status(200).json(result)
+const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs')
+pdfjsLib.GlobalWorkerOptions.workerSrc = ''
+const loadingTask = pdfjsLib.getDocument({ 
+  data: new Uint8Array(pdfPart.data),
+  useWorkerFetch: false,
+  isEvalSupported: false,
+  useSystemFonts: true,
+})
+const pdfDoc = await loadingTask.promise
+let text = ''
+for (let i = 1; i <= pdfDoc.numPages; i++) {
+  const page = await pdfDoc.getPage(i)
+  const content = await page.getTextContent()
+  text += content.items.map(item => item.str).join(' ') + '\n'
+}
+const result = parseDailyStatement(text)
+res.status(200).json(result)
   } catch (err) {
     console.error('PDF parse error:', err)
     res.status(500).json({ error: err.message })
