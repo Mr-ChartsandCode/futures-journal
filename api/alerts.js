@@ -373,7 +373,11 @@ async function fetchEconAlerts() {
           },
           signal: AbortSignal.timeout(6000),
         })
-        if (!r.ok) return
+        if (!r.ok) {
+          console.log(`[${feed.label}] FAILED status:`, r.status)
+          return
+        }
+        console.log(`[${feed.label}] fetched OK, status:`, r.status)
 
         const xml = await r.text()
         const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
@@ -393,6 +397,7 @@ async function fetchEconAlerts() {
           if (!title) continue
           const titleLower = title.toLowerCase()
           const isHighImpact = HIGH_IMPACT.some(k => titleLower.includes(k))
+          console.log(`[${feed.label}] ITEM:`, title, '| pubDate:', pubDate)
           if (!isHighImpact) continue
 
           const pubTime = pubDate ? new Date(pubDate) : null
