@@ -353,7 +353,10 @@ async function fetchEconAlerts() {
         if (!G20_CURRENCIES.has(e.country)) return false
         if (e.impact !== 'High' && e.impact !== 'Medium') return false
         const eventTime = new Date(e.date)
-        const isToday = eventTime.toDateString() === now.toDateString()
+        // Compare dates in UTC to avoid timezone mismatch on Vercel
+        const todayUTC = now.toISOString().slice(0, 10)
+        const eventUTC = eventTime.toISOString().slice(0, 10)
+        const isToday = eventUTC === todayUTC
         return isToday && eventTime <= now && now >= marketOpen && now <= marketClose
       })
       .map(e => {
@@ -361,7 +364,7 @@ async function fetchEconAlerts() {
         const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(e.title)
         const headline = `${isSpeaker ? '🎤' : '⚡'} ${e.title} (${e.country}) — ${isSpeaker ? 'SPEAKING NOW' : 
           `Released ${eventTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })} ET`}${e.forecast ? 
-            ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}${e.actual ? ` | Actual: ${e.actual}` : ' | Actual: Pending'}`
+            ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}${e.actual ? ` | Actual: ${e.actual}` : ''}`
         return {
           id: `econ-${e.title}-${e.date}`,
           headline,
