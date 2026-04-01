@@ -336,48 +336,78 @@ const G20_CURRENCIES = new Set([
 
 async function fetchEconAlerts() {
   try {
-    const r = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json', {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
+    const r = await fetch('https://www.investing.com/rss/news_301.rss', {
+      headers: { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+      }
     })
-    const data = await r.json()
+    const xml = await r.text()
     const now = new Date()
 
     const marketClose = new Date()
     marketClose.setUTCHours(21, 0, 0, 0)
-
     const marketOpen = new Date()
     marketOpen.setUTCHours(13, 30, 0, 0)
-    console.log('FF SAMPLE:', JSON.stringify((Array.isArray(data) ? data : []).find(e => e.country === 'USD' && e.impact === 'High'), null, 2))
-    return (Array.isArray(data) ? data : [])
-      .filter(e => {
-        if (!G20_CURRENCIES.has(e.country)) return false
-        if (e.impact !== 'High' && e.impact !== 'Medium') return false
-        const eventTime = new Date(e.date)
-        // Compare dates in UTC to avoid timezone mismatch on Vercel
-        const todayUTC = now.toISOString().slice(0, 10)
-        const eventUTC = eventTime.toISOString().slice(0, 10)
-        const isToday = eventUTC === todayUTC
-        return isToday && eventTime <= now && now >= marketOpen && now <= marketClose
+
+    const items = []
+    const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
+
+    const HIGH_IMPACT = [
+      'nonfarm','nfp','cpi','pce','fomc','fed rate','interest rate decision',
+      'gdp','unemployment','jolts','retail sales','ism manufacturing','ism services',
+      'ppi','core inflation','jobs','payroll','fed chair','powell',
+      'consumer price','producer price','housing starts','durable goods',
+    ]
+
+    for (const match of itemMatches) {
+      const block = match[1]
+      const get = (tag) => {
+        const m = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
+        return m ? (m[1] || m[2] || '').trim() : ''
+      }
+
+      const title = get('title')
+      const pubDate = get('pubDate')
+      const link = block.match(/<link>\s*(.*?)\s*<\/link>/)?.[1]?.trim() || get('link')
+      const guid = get('guid') || link
+
+      if (!title) continue
+
+      const titleLower = title.toLowerCase()
+      const isHighImpact = HIGH_IMPACT.some(k => titleLower.includes(k))
+      if (!isHighImpact) continue
+
+      const pubTime = pubDate ? new Date(pubDate) : null
+      if (!pubTime) continue
+
+      const todayUTC = now.toISOString().slice(0, 10)
+      const itemUTC = pubTime.toISOString().slice(0, 10)
+      if (itemUTC !== todayUTC) continue
+      if (pubTime > now) continue
+      if (now < marketOpen || now > marketClose) continue
+
+      const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(title)
+
+      items.push({
+        id: `econ-${guid}`,
+        headline: `${isSpeaker ? '🎤' : '⚡'} ${title}`,
+        summary: title,
+        source: 'ECON ALERT',
+        category: 'Alert',
+        created_at: pubTime.toISOString(),
+        isAlert: true,
+        alertType: 'economic',
+        changePct: 0,
+        url: link,
       })
-      .map(e => {
-        const eventTime = new Date(e.date)
-        const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(e.title)
-        const headline = `${isSpeaker ? '🎤' : '⚡'} ${e.title} (${e.country}) — ${isSpeaker ? 'SPEAKING NOW' : 
-          `Released ${eventTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' })} ET`}
-          ${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Previous: ${e.previous}` : ''}`
-        return {
-          id: `econ-${e.title}-${e.date}`,
-          headline,
-          summary: `${e.country} economic event.${e.forecast ? ` Forecast: ${e.forecast}.` : ''}${e.previous ? ` Previous: ${e.previous}.` : ''}${e.actual ? ` Actual: ${e.actual}.` : ''}`,
-          source: 'ECON ALERT',
-          category: 'Alert',
-          created_at: e.date,
-          isAlert: true,
-          alertType: 'economic',
-          changePct: 0,
-        }
-      })
-  } catch { return [] }
+    }
+
+    return items
+  } catch (err) {
+    console.error('Econ alerts error:', err)
+    return []
+  }
 }
 
 export default async function handler(req, res) {
