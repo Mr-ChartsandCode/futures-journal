@@ -32,7 +32,7 @@ const JUNK_PHRASES = [
   'transgender', 'athletes', 'prayers', 'score', 'fan', 'stadium', 'world cup', 'playoff',
   'NBA', 'luncheon', 'lunch with', 'charity','opinion', 'tea','endorses', 'Stocks Rise', 'Stocks Fall',
   'New Super-App', 'displacement', 'Emissions', 'nasa', 'tsunami', 'probes', 'polluted', 'no one', 'everyone',
-  'tmz', 'bill ackman', 'maha', 'maga', 'medical', 
+  'tmz', 'bill ackman', 'maha', 'maga', 'medical', 'Stocks Advance', 'Stocks Decline'
 ]
 
 const EARNINGS_JUNK = [
