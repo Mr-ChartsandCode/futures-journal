@@ -197,6 +197,7 @@ async function fetchForexFactoryAlerts() {
       })
     }
 
+    console.log('FF alerts found:', alerts.map(a => a.headline))
     return alerts
   } catch (err) {
     console.error('ForexFactory alerts error:', err)
