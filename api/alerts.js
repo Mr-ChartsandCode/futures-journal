@@ -338,12 +338,12 @@ const BLS_API_KEY = process.env.BLS_API_KEY || '12eb208862cb4f5b9729e94cae77d50a
 
 // BLS series IDs for major market-moving releases
 const BLS_SERIES = [
-  { id: 'CUUR0000SA0',  name: 'CPI (All Urban)',        short: 'CPI' },
-  { id: 'WPUFD4',       name: 'PPI Final Demand',        short: 'PPI' },
-  { id: 'CES0000000001',name: 'Nonfarm Payrolls',        short: 'NFP' },
-  { id: 'LNS14000000',  name: 'Unemployment Rate',       short: 'UNRATE' },
-  { id: 'ICSA',         name: 'Initial Jobless Claims',  short: 'CLAIMS' },
-  { id: 'JTS000000000000000HIR', name: 'JOLTS Hires',   short: 'JOLTS' },
+  { id: 'CUUR0000SA0',   name: 'CPI',             short: 'CPI' },
+  { id: 'WPUFD4',        name: 'PPI Final Demand', short: 'PPI' },
+  { id: 'CES0000000001', name: 'Nonfarm Payrolls', short: 'NFP' },
+  { id: 'LNS14000000',   name: 'Unemployment Rate',short: 'UNRATE' },
+  { id: 'JTS000000000000000JOR', name: 'JOLTS Job Openings', short: 'JOLTS' },
+  { id: 'LNS13000000',   name: 'Total Unemployed', short: 'UNEMP' },
 ]
 
 async function fetchBLSAlerts() {
@@ -420,7 +420,7 @@ async function fetchBLSAlerts() {
         summary: `${meta.name} for ${periodLabel}. Actual: ${actual}.${previous ? ` Previous: ${previous}.` : ''}`,
         source: 'BLS DATA',
         category: 'Alert',
-        created_at: new Date(entryYear, entryMonth - 1, 1).toISOString(),
+        created_at: new Date().toISOString(),
         isAlert: true,
         alertType: 'economic',
         changePct: 0,
