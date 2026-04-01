@@ -3,7 +3,6 @@ import { useTrades } from '../hooks/useTrades'
 import { useMemo, useState } from 'react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWeekend } from 'date-fns'
-import ImportPDF from '../components/ImportPDF'
 import { supabase } from '../lib/supabase'
 
 const tip = {
