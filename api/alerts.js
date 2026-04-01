@@ -63,18 +63,14 @@ const FRED_API_KEY = process.env.FRED_API_KEY
 
 // FRED series for non-BLS market-moving releases
 const FRED_SERIES = [
-  { id: 'PCEPILFE',          name: 'Core PCE Price Index MoM',   short: 'COREPCE',        source: 'BEA' },
-  { id: 'PCEPI',             name: 'PCE Price Index MoM',         short: 'PCE',            source: 'BEA' },
-  { id: 'PI',                name: 'Personal Income MoM',         short: 'PERSONAL_INCOME', source: 'BEA' },
-  { id: 'PCE',               name: 'Personal Spending MoM',       short: 'PERSONAL_SPENDING', source: 'BEA' },
-  { id: 'A191RL1Q225SBEA',   name: 'GDP Growth Rate QoQ',         short: 'GDP',            source: 'BEA' },
-  { id: 'DGORDER',           name: 'Durable Goods Orders MoM',    short: 'DURABLE',        source: 'CENSUS' },
-  { id: 'EXHOSLUSM495S',     name: 'Existing Home Sales',         short: 'EXISTING_HOME',  source: 'NAR' },
-  { id: 'MANEMP',            name: 'ISM Manufacturing PMI',        short: 'ISM_MFG',        source: 'ISM' },
-  { id: 'NMFBAI',            name: 'ISM Services PMI',             short: 'ISM_SVCS',       source: 'ISM' },
-  { id: 'FEDFUNDS',          name: 'Fed Interest Rate Decision',   short: 'FOMC',           source: 'FEDERAL RESERVE' },
-  { id: 'DPCCRV1M086SBEA',   name: 'Core PCE MoM % Change',       short: 'COREPCE_PCT',    source: 'BEA' },
-  { id: 'RSAFS',             name: 'Retail Sales MoM',             short: 'RETAIL',         source: 'CENSUS' },
+  { id: 'PCEPILFE',        name: 'Core PCE Price Index',      short: 'COREPCE',          source: 'BEA' },
+  { id: 'PCEPI',           name: 'PCE Price Index',            short: 'PCE',              source: 'BEA' },
+  { id: 'PI',              name: 'Personal Income',            short: 'PERSONAL_INCOME',  source: 'BEA' },
+  { id: 'PCE',             name: 'Personal Spending',          short: 'PERSONAL_SPENDING',source: 'BEA' },
+  { id: 'A191RL1Q225SBEA', name: 'GDP Growth Rate QoQ',        short: 'GDP',              source: 'BEA' },
+  { id: 'DGORDER',         name: 'Durable Goods Orders',       short: 'DURABLE',          source: 'CENSUS' },
+  { id: 'EXHOSLUSM495S',   name: 'Existing Home Sales',        short: 'EXISTING_HOME',    source: 'NAR' },
+  { id: 'FEDFUNDS',        name: 'Fed Interest Rate Decision', short: 'FOMC',             source: 'FEDERAL RESERVE' },
 ]
 
 async function fetchFREDAlerts() {
