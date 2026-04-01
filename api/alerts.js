@@ -336,76 +336,102 @@ const G20_CURRENCIES = new Set([
 
 async function fetchEconAlerts() {
   try {
-    const r = await fetch('https://www.investing.com/rss/news_301.rss', {
-      headers: { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-      }
-    })
-    const xml = await r.text()
     const now = new Date()
-
     const marketClose = new Date()
     marketClose.setUTCHours(21, 0, 0, 0)
     const marketOpen = new Date()
     marketOpen.setUTCHours(13, 30, 0, 0)
 
-    const items = []
-    const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
+    if (now < marketOpen || now > marketClose) return []
 
-    const HIGH_IMPACT = [
-      'nonfarm','nfp','cpi','pce','fomc','fed rate','interest rate decision',
-      'gdp','unemployment','jolts','retail sales','ism manufacturing','ism services',
-      'ppi','core inflation','jobs','payroll','fed chair','powell',
-      'consumer price','producer price','housing starts','durable goods',
+    const todayUTC = now.toISOString().slice(0, 10)
+
+    const ECON_FEEDS = [
+      { url: 'https://tradingeconomics.com/rss/releases.aspx', label: 'Trading Economics' },
+      { url: 'https://www.bls.gov/feed/bls_latest.rss', label: 'BLS' },
+      { url: 'https://www.federalreserve.gov/feeds/press_all.xml', label: 'Federal Reserve' },
     ]
 
-    for (const match of itemMatches) {
-      const block = match[1]
-      const get = (tag) => {
-        const m = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
-        return m ? (m[1] || m[2] || '').trim() : ''
+    const HIGH_IMPACT = [
+      'nonfarm','cpi','pce','fomc','rate decision','gdp','unemployment',
+      'jolts','retail sales','ism','ppi','payroll','powell','fed chair',
+      'consumer price','producer price','housing starts','durable goods',
+      'consumer confidence','consumer sentiment','initial claims',
+      'trade balance','current account','inflation','interest rate',
+      'manufacturing','services pmi','core retail','personal income',
+      'personal spending','factory orders','building permits',
+    ]
+
+    const items = []
+
+    await Promise.allSettled(ECON_FEEDS.map(async feed => {
+      try {
+        const r = await fetch(feed.url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+          },
+          signal: AbortSignal.timeout(6000),
+        })
+        if (!r.ok) return
+
+        const xml = await r.text()
+        const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
+
+        for (const match of itemMatches) {
+          const block = match[1]
+          const get = (tag) => {
+            const m = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
+            return m ? (m[1] || m[2] || '').trim() : ''
+          }
+
+          const title = get('title')
+          const pubDate = get('pubDate')
+          const link = block.match(/<link>\s*(.*?)\s*<\/link>/)?.[1]?.trim() || get('link')
+          const guid = get('guid') || link
+
+          if (!title) continue
+          const titleLower = title.toLowerCase()
+          const isHighImpact = HIGH_IMPACT.some(k => titleLower.includes(k))
+          if (!isHighImpact) continue
+
+          const pubTime = pubDate ? new Date(pubDate) : null
+          if (!pubTime || isNaN(pubTime)) continue
+
+          const itemUTC = pubTime.toISOString().slice(0, 10)
+          if (itemUTC !== todayUTC) continue
+          if (pubTime > now) continue
+
+          const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(title)
+
+          items.push({
+            id: `econ-${guid}-${feed.label}`,
+            headline: `${isSpeaker ? '🎤' : '⚡'} ${title}`,
+            summary: title,
+            source: 'ECON ALERT',
+            category: 'Alert',
+            created_at: pubTime.toISOString(),
+            isAlert: true,
+            alertType: 'economic',
+            changePct: 0,
+            url: link || null,
+          })
+        }
+      } catch (err) {
+        console.error(`${feed.label} econ feed error:`, err.message)
       }
+    }))
 
-      const title = get('title')
-      const pubDate = get('pubDate')
-      const link = block.match(/<link>\s*(.*?)\s*<\/link>/)?.[1]?.trim() || get('link')
-      const guid = get('guid') || link
+    // Dedupe by title
+    const seen = new Set()
+    return items.filter(item => {
+      if (seen.has(item.headline)) return false
+      seen.add(item.headline)
+      return true
+    }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
-      if (!title) continue
-
-      const titleLower = title.toLowerCase()
-      const isHighImpact = HIGH_IMPACT.some(k => titleLower.includes(k))
-      if (!isHighImpact) continue
-
-      const pubTime = pubDate ? new Date(pubDate) : null
-      if (!pubTime) continue
-
-      const todayUTC = now.toISOString().slice(0, 10)
-      const itemUTC = pubTime.toISOString().slice(0, 10)
-      if (itemUTC !== todayUTC) continue
-      if (pubTime > now) continue
-      if (now < marketOpen || now > marketClose) continue
-
-      const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(title)
-
-      items.push({
-        id: `econ-${guid}`,
-        headline: `${isSpeaker ? '🎤' : '⚡'} ${title}`,
-        summary: title,
-        source: 'ECON ALERT',
-        category: 'Alert',
-        created_at: pubTime.toISOString(),
-        isAlert: true,
-        alertType: 'economic',
-        changePct: 0,
-        url: link,
-      })
-    }
-
-    return items
   } catch (err) {
-    console.error('Econ alerts error:', err)
+    console.error('fetchEconAlerts error:', err)
     return []
   }
 }
