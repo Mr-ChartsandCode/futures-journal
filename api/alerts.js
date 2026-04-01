@@ -347,7 +347,7 @@ async function fetchEconAlerts() {
 
     const marketOpen = new Date()
     marketOpen.setUTCHours(13, 30, 0, 0)
-
+    console.log('FF SAMPLE:', JSON.stringify((Array.isArray(data) ? data : []).find(e => e.country === 'USD' && e.impact === 'High'), null, 2))
     return (Array.isArray(data) ? data : [])
       .filter(e => {
         if (!G20_CURRENCIES.has(e.country)) return false
