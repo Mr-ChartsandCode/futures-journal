@@ -108,16 +108,13 @@ export default async function handler(req, res) {
     if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
 
     // pdf2json works natively in Node.js without browser APIs
-    const { default: PDFParser } = await import('pdf2json')
-    
-    const text = await new Promise((resolve, reject) => {
-      const parser = new PDFParser(null, true)
-      parser.on('pdfParser_dataReady', () => {
-        resolve(parser.getRawTextContent())
-      })
-      parser.on('pdfParser_dataError', reject)
-      parser.parseBuffer(pdfPart.data)
-    })
+    // pdf-parse with test file bug workaround
+const pdfParse = (await import('pdf-parse')).default
+const parsed = await pdfParse(pdfPart.data, {
+  max: 0,
+  version: 'default'
+})
+const text = parsed.text
 
     console.log('PDF TEXT:', text.slice(0, 300))
     const result = parseDailyStatement(text)
