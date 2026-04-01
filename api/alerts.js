@@ -1,5 +1,4 @@
 const TRACKED_TICKERS = [
-// Technology — XLK
   { symbol: 'MSFT',  name: 'Microsoft',           sector: 'Technology', cap: 3100 },
   { symbol: 'AAPL',  name: 'Apple',               sector: 'Technology', cap: 3000 },
   { symbol: 'NVDA',  name: 'Nvidia',              sector: 'Technology', cap: 2900 },
@@ -29,8 +28,6 @@ const TRACKED_TICKERS = [
   { symbol: 'ANSS',  name: 'Ansys',               sector: 'Technology', cap: 30 },
   { symbol: 'PTC',   name: 'PTC Inc',             sector: 'Technology', cap: 25 },
   { symbol: 'JNPR',  name: 'Juniper Networks',    sector: 'Technology', cap: 12 },
-
-  // Communication Services — XLC
   { symbol: 'GOOGL', name: 'Alphabet A',          sector: 'Communication Services', cap: 2100 },
   { symbol: 'GOOG',  name: 'Alphabet C',          sector: 'Communication Services', cap: 2050 },
   { symbol: 'META',  name: 'Meta',                sector: 'Communication Services', cap: 1600 },
@@ -49,8 +46,6 @@ const TRACKED_TICKERS = [
   { symbol: 'TTWO',  name: 'Take-Two',            sector: 'Communication Services', cap: 30 },
   { symbol: 'LYV',   name: 'Live Nation',         sector: 'Communication Services', cap: 25 },
   { symbol: 'FOXA',  name: 'Fox Corp A',          sector: 'Communication Services', cap: 22 },
-
-  // Consumer Discretionary — XLY
   { symbol: 'AMZN',  name: 'Amazon',              sector: 'Consumer Discretionary', cap: 2100 },
   { symbol: 'TSLA',  name: 'Tesla',               sector: 'Consumer Discretionary', cap: 800 },
   { symbol: 'HD',    name: 'Home Depot',          sector: 'Consumer Discretionary', cap: 340 },
@@ -76,8 +71,6 @@ const TRACKED_TICKERS = [
   { symbol: 'ROST',  name: 'Ross Stores',         sector: 'Consumer Discretionary', cap: 45 },
   { symbol: 'BBY',   name: 'Best Buy',            sector: 'Consumer Discretionary', cap: 15 },
   { symbol: 'APTV',  name: 'Aptiv',               sector: 'Consumer Discretionary', cap: 12 },
-
-  // Consumer Staples — XLP
   { symbol: 'WMT',   name: 'Walmart',             sector: 'Consumer Staples', cap: 770 },
   { symbol: 'COST',  name: 'Costco',              sector: 'Consumer Staples', cap: 400 },
   { symbol: 'PG',    name: 'Procter & Gamble',    sector: 'Consumer Staples', cap: 370 },
@@ -96,8 +89,6 @@ const TRACKED_TICKERS = [
   { symbol: 'ADM',   name: 'Archer-Daniels',      sector: 'Consumer Staples', cap: 25 },
   { symbol: 'CAG',   name: 'ConAgra',             sector: 'Consumer Staples', cap: 15 },
   { symbol: 'TAP',   name: 'Molson Coors',        sector: 'Consumer Staples', cap: 10 },
-
-  // Financials — XLF
   { symbol: 'BRK.B', name: 'Berkshire Hathaway',  sector: 'Financials', cap: 1000 },
   { symbol: 'JPM',   name: 'JPMorgan',            sector: 'Financials', cap: 700 },
   { symbol: 'V',     name: 'Visa',                sector: 'Financials', cap: 540 },
@@ -131,8 +122,6 @@ const TRACKED_TICKERS = [
   { symbol: 'MTB',   name: 'M&T Bank',            sector: 'Financials', cap: 25 },
   { symbol: 'FDS',   name: 'FactSet',             sector: 'Financials', cap: 18 },
   { symbol: 'MSCI',  name: 'MSCI Inc',            sector: 'Financials', cap: 40 },
-
-  // Healthcare — XLV
   { symbol: 'LLY',   name: 'Eli Lilly',           sector: 'Healthcare', cap: 700 },
   { symbol: 'UNH',   name: 'UnitedHealth',        sector: 'Healthcare', cap: 470 },
   { symbol: 'JNJ',   name: 'J&J',                 sector: 'Healthcare', cap: 370 },
@@ -168,8 +157,6 @@ const TRACKED_TICKERS = [
   { symbol: 'VAR',   name: 'Varian Medical',      sector: 'Healthcare', cap: 15 },
   { symbol: 'VTRS',  name: 'Viatris',             sector: 'Healthcare', cap: 12 },
   { symbol: 'ALGN',  name: 'Align Technology',    sector: 'Healthcare', cap: 15 },
-
-  // Energy — XLE
   { symbol: 'XOM',   name: 'ExxonMobil',          sector: 'Energy', cap: 490 },
   { symbol: 'CVX',   name: 'Chevron',             sector: 'Energy', cap: 270 },
   { symbol: 'COP',   name: 'ConocoPhillips',      sector: 'Energy', cap: 120 },
@@ -190,8 +177,6 @@ const TRACKED_TICKERS = [
   { symbol: 'HES',   name: 'Hess Corp',           sector: 'Energy', cap: 40 },
   { symbol: 'TRGP',  name: 'Targa Resources',     sector: 'Energy', cap: 35 },
   { symbol: 'APA',   name: 'APA Corp',            sector: 'Energy', cap: 10 },
-
-  // Industrials — XLI
   { symbol: 'GE',    name: 'GE Aerospace',        sector: 'Industrials', cap: 200 },
   { symbol: 'RTX',   name: 'RTX Corp',            sector: 'Industrials', cap: 160 },
   { symbol: 'CAT',   name: 'Caterpillar',         sector: 'Industrials', cap: 170 },
@@ -228,8 +213,6 @@ const TRACKED_TICKERS = [
   { symbol: 'AAL',   name: 'American Airlines',   sector: 'Industrials', cap: 10 },
   { symbol: 'LUV',   name: 'Southwest Airlines',  sector: 'Industrials', cap: 18 },
   { symbol: 'JBHT',  name: 'J.B. Hunt',           sector: 'Industrials', cap: 18 },
-
-  // Materials — XLB
   { symbol: 'LIN',   name: 'Linde',               sector: 'Materials', cap: 210 },
   { symbol: 'APD',   name: 'Air Products',        sector: 'Materials', cap: 60 },
   { symbol: 'SHW',   name: 'Sherwin-Williams',    sector: 'Materials', cap: 90 },
@@ -250,8 +233,6 @@ const TRACKED_TICKERS = [
   { symbol: 'MOS',   name: 'Mosaic',              sector: 'Materials', cap: 10 },
   { symbol: 'RPM',   name: 'RPM International',   sector: 'Materials', cap: 15 },
   { symbol: 'AVY',   name: 'Avery Dennison',      sector: 'Materials', cap: 15 },
-
-  // Utilities — XLU
   { symbol: 'NEE',   name: 'NextEra Energy',      sector: 'Utilities', cap: 140 },
   { symbol: 'SO',    name: 'Southern Company',    sector: 'Utilities', cap: 90 },
   { symbol: 'DUK',   name: 'Duke Energy',         sector: 'Utilities', cap: 90 },
@@ -276,8 +257,6 @@ const TRACKED_TICKERS = [
   { symbol: 'AES',   name: 'AES Corp',            sector: 'Utilities', cap: 15 },
   { symbol: 'VST',   name: 'Vistra',              sector: 'Utilities', cap: 45 },
   { symbol: 'CEG',   name: 'Constellation Energy',sector: 'Utilities', cap: 55 },
-
-  // Real Estate — XLRE
   { symbol: 'PLD',   name: 'Prologis',            sector: 'Real Estate', cap: 100 },
   { symbol: 'AMT',   name: 'American Tower',      sector: 'Real Estate', cap: 90 },
   { symbol: 'EQIX',  name: 'Equinix',             sector: 'Real Estate', cap: 80 },
@@ -300,8 +279,6 @@ const TRACKED_TICKERS = [
   { symbol: 'KIM',   name: 'Kimco Realty',        sector: 'Real Estate', cap: 15 },
   { symbol: 'REG',   name: 'Regency Centers',     sector: 'Real Estate', cap: 12 },
   { symbol: 'NNN',   name: 'NNN REIT',            sector: 'Real Estate', cap: 10 },
-
-  // Biotech — XBI
   { symbol: 'LLY',   name: 'Eli Lilly',           sector: 'Biotech', cap: 700 },
   { symbol: 'ABBV',  name: 'AbbVie',              sector: 'Biotech', cap: 310 },
   { symbol: 'AMGN',  name: 'Amgen',               sector: 'Biotech', cap: 140 },
@@ -329,35 +306,121 @@ const TRACKED_TICKERS = [
   { symbol: 'PTGX',  name: 'Protagonist Therapeutics', sector: 'Biotech', cap: 2 },
 ]
 
-const G20_CURRENCIES = new Set([
-  'USD','EUR','GBP','JPY','CAD','AUD','CNY','CNH','INR','BRL',
-  'KRW','MXN','RUB','ZAR','TRY','SAR','ARS','IDR','CHF','SGD'
-])
-
 const BLS_API_KEY = process.env.BLS_API_KEY || '12eb208862cb4f5b9729e94cae77d50a'
 
-// BLS series IDs for major market-moving releases
+// BLS series — what BLS API can actually provide
 const BLS_SERIES = [
-  { id: 'CUUR0000SA0',   name: 'CPI',             short: 'CPI' },
-  { id: 'WPUFD4',        name: 'PPI Final Demand', short: 'PPI' },
-  { id: 'CES0000000001', name: 'Nonfarm Payrolls', short: 'NFP' },
-  { id: 'LNS14000000',   name: 'Unemployment Rate',short: 'UNRATE' },
+  { id: 'CUUR0000SA0',   name: 'CPI',              short: 'CPI' },
+  { id: 'CUUR0000SA0L1E',name: 'Core CPI',          short: 'CORECPI' },
+  { id: 'WPUFD4',        name: 'PPI Final Demand',  short: 'PPI' },
+  { id: 'CES0000000001', name: 'Nonfarm Payrolls',  short: 'NFP' },
+  { id: 'LNS14000000',   name: 'Unemployment Rate', short: 'UNRATE' },
   { id: 'JTS000000000000000JOR', name: 'JOLTS Job Openings', short: 'JOLTS' },
-  { id: 'LNS13000000',   name: 'Total Unemployed', short: 'UNEMP' },
+  { id: 'RSXFS',         name: 'Retail Sales',      short: 'RETAIL' },
 ]
+
+// Hardcoded 2026 release schedule — auto-fallback if BLS schedule API fails
+// All BLS releases at 8:30 AM ET (13:30 UTC) unless noted
+// Fed releases at 2:00 PM ET (19:00 UTC)
+// ISM releases at 10:00 AM ET (15:00 UTC)
+// BEA (GDP/PCE) releases at 8:30 AM ET (13:30 UTC)
+const RELEASE_SCHEDULE_2026 = {
+  // BLS
+  'CPI':     { dates: ['2026-01-14','2026-02-11','2026-03-11','2026-04-10','2026-05-12','2026-06-11','2026-07-14','2026-08-12','2026-09-11','2026-10-13','2026-11-12','2026-12-11'], utcHour: 13 },
+  'CORECPI': { dates: ['2026-01-14','2026-02-11','2026-03-11','2026-04-10','2026-05-12','2026-06-11','2026-07-14','2026-08-12','2026-09-11','2026-10-13','2026-11-12','2026-12-11'], utcHour: 13 },
+  'PPI':     { dates: ['2026-01-15','2026-02-12','2026-03-12','2026-04-14','2026-05-13','2026-06-12','2026-07-15','2026-08-13','2026-09-14','2026-10-14','2026-11-13','2026-12-14'], utcHour: 13 },
+  'NFP':     { dates: ['2026-01-09','2026-02-06','2026-03-06','2026-04-03','2026-05-08','2026-06-05','2026-07-02','2026-08-07','2026-09-04','2026-10-02','2026-11-06','2026-12-04'], utcHour: 13 },
+  'UNRATE':  { dates: ['2026-01-09','2026-02-06','2026-03-06','2026-04-03','2026-05-08','2026-06-05','2026-07-02','2026-08-07','2026-09-04','2026-10-02','2026-11-06','2026-12-04'], utcHour: 13 },
+  'JOLTS':   { dates: ['2026-02-04','2026-03-04','2026-04-01','2026-05-05','2026-06-02','2026-07-07','2026-08-04','2026-09-01','2026-10-06','2026-11-03','2026-12-01'], utcHour: 13 },
+  'RETAIL':  { dates: ['2026-01-16','2026-02-17','2026-03-17','2026-04-15','2026-05-15','2026-06-16','2026-07-16','2026-08-14','2026-09-16','2026-10-15','2026-11-17','2026-12-16'], utcHour: 13 },
+  // Fed — not from BLS, handled separately as static alerts
+  'FOMC':    { dates: ['2026-01-29','2026-03-18','2026-05-06','2026-06-17','2026-07-29','2026-09-16','2026-10-28','2026-12-09'], utcHour: 19 },
+  'FOMC_MINUTES': { dates: ['2026-02-18','2026-04-08','2026-05-27','2026-07-08','2026-08-19','2026-10-07','2026-11-25'], utcHour: 19 },
+  // BEA releases — GDP and PCE
+  'GDP':     { dates: ['2026-01-29','2026-02-26','2026-03-26','2026-04-29','2026-05-28','2026-06-25','2026-07-30','2026-08-27','2026-09-30','2026-10-29','2026-11-25','2026-12-22'], utcHour: 13 },
+  'PCE':     { dates: ['2026-01-30','2026-02-27','2026-03-27','2026-04-30','2026-05-29','2026-06-26','2026-07-31','2026-08-28','2026-10-01','2026-10-30','2026-11-25','2026-12-23'], utcHour: 13 },
+  'COREPCE': { dates: ['2026-01-30','2026-02-27','2026-03-27','2026-04-30','2026-05-29','2026-06-26','2026-07-31','2026-08-28','2026-10-01','2026-10-30','2026-11-25','2026-12-23'], utcHour: 13 },
+  'PERSONAL_INCOME':   { dates: ['2026-01-30','2026-02-27','2026-03-27','2026-04-30','2026-05-29','2026-06-26','2026-07-31','2026-08-28','2026-10-01','2026-10-30','2026-11-25','2026-12-23'], utcHour: 13 },
+  'PERSONAL_SPENDING': { dates: ['2026-01-30','2026-02-27','2026-03-27','2026-04-30','2026-05-29','2026-06-26','2026-07-31','2026-08-28','2026-10-01','2026-10-30','2026-11-25','2026-12-23'], utcHour: 13 },
+  // ISM — not from BLS or BEA
+  'ISM_MFG':  { dates: ['2026-02-03','2026-03-02','2026-04-01','2026-05-01','2026-06-01','2026-07-01','2026-08-03','2026-09-01','2026-10-01','2026-11-02','2026-12-01'], utcHour: 15 },
+  'ISM_SVCS': { dates: ['2026-02-05','2026-03-04','2026-04-03','2026-05-05','2026-06-03','2026-07-07','2026-08-05','2026-09-03','2026-10-05','2026-11-04','2026-12-03'], utcHour: 15 },
+  // Census Bureau
+  'DURABLE':  { dates: ['2026-01-28','2026-02-25','2026-03-25','2026-04-24','2026-05-27','2026-06-24','2026-07-28','2026-08-26','2026-09-25','2026-10-28','2026-11-25','2026-12-23'], utcHour: 13 },
+  'EXISTING_HOME': { dates: ['2026-01-23','2026-02-20','2026-03-20','2026-04-22','2026-05-21','2026-06-19','2026-07-22','2026-08-20','2026-09-22','2026-10-22','2026-11-19','2026-12-21'], utcHour: 15 },
+}
+
+function getReleaseTimestamp(short) {
+  const schedule = RELEASE_SCHEDULE_2026[short]
+  if (!schedule) return null
+
+  const now = new Date()
+  const todayStr = now.toISOString().slice(0, 10)
+  const ytdStart = `${now.getFullYear()}-01-01`
+
+  const past = schedule.dates
+    .filter(d => d >= ytdStart && d <= todayStr)
+    .sort()
+    .reverse()
+
+  if (!past.length) return null
+  return new Date(`${past[0]}T${String(schedule.utcHour).padStart(2,'0')}:30:00.000Z`)
+}
+
+// Static alerts for non-BLS releases that happened this year
+function getStaticEconAlerts() {
+  const now = new Date()
+  const todayStr = now.toISOString().slice(0, 10)
+  const ytdStart = `${now.getFullYear()}-01-01`
+  const alerts = []
+
+  const STATIC = [
+    { short: 'FOMC',      name: 'Fed Interest Rate Decision', source: 'FEDERAL RESERVE' },
+    { short: 'FOMC_MINUTES', name: 'FOMC Meeting Minutes',   source: 'FEDERAL RESERVE' },
+    { short: 'GDP',       name: 'GDP Growth Rate QoQ',        source: 'BEA' },
+    { short: 'PCE',       name: 'PCE Price Index MoM',        source: 'BEA' },
+    { short: 'COREPCE',   name: 'Core PCE Price Index MoM',   source: 'BEA' },
+    { short: 'PERSONAL_INCOME',   name: 'Personal Income MoM',   source: 'BEA' },
+    { short: 'PERSONAL_SPENDING', name: 'Personal Spending MoM',  source: 'BEA' },
+    { short: 'ISM_MFG',   name: 'ISM Manufacturing PMI',      source: 'ISM' },
+    { short: 'ISM_SVCS',  name: 'ISM Services PMI',           source: 'ISM' },
+    { short: 'DURABLE',   name: 'Durable Goods Orders MoM',   source: 'CENSUS' },
+    { short: 'EXISTING_HOME', name: 'Existing Home Sales',    source: 'NAR' },
+  ]
+
+  for (const item of STATIC) {
+    const ts = getReleaseTimestamp(item.short)
+    if (!ts) continue
+    const releaseDateStr = ts.toISOString().slice(0, 10)
+    if (releaseDateStr < ytdStart || releaseDateStr > todayStr) continue
+
+    const releaseTimeET = ts.toLocaleTimeString('en-US', {
+      hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'
+    })
+
+    alerts.push({
+      id: `static-${item.short}-${releaseDateStr}`,
+      headline: `⚡ ${item.name} — Released ${releaseTimeET} ET`,
+      summary: `${item.name} released today at ${releaseTimeET} ET.`,
+      source: item.source,
+      category: 'Alert',
+      created_at: ts.toISOString(),
+      isAlert: true,
+      alertType: 'economic',
+      changePct: 0,
+    })
+  }
+
+  return alerts
+}
 
 async function fetchBLSAlerts() {
   try {
     const now = new Date()
-    const marketOpen = new Date()
-    marketOpen.setUTCHours(13, 30, 0, 0)
-    const marketClose = new Date()
-    marketClose.setUTCHours(21, 0, 0, 0)
-    if (now < marketOpen || now > marketClose) return []
-
     const currentYear = now.getFullYear()
     const currentMonth = now.getMonth() + 1
     const todayStr = now.toISOString().slice(0, 10)
+    const ytdStart = `${currentYear}-01-01`
 
     const body = {
       seriesid: BLS_SERIES.map(s => s.id),
@@ -387,12 +450,9 @@ async function fetchBLSAlerts() {
       const latestEntry = series.data?.[0]
       if (!latestEntry) continue
 
-      // Check if this release is from current or previous month (BLS releases with 1 month lag)
       const entryYear = parseInt(latestEntry.year)
-      const entryPeriod = latestEntry.period // M01-M12
+      const entryPeriod = latestEntry.period
       const entryMonth = parseInt(entryPeriod.replace('M', ''))
-
-      // Only alert if it's recent data (this month or last month's release)
       const monthsOld = (currentYear - entryYear) * 12 + (currentMonth - entryMonth)
       if (monthsOld > 2) continue
 
@@ -400,19 +460,27 @@ async function fetchBLSAlerts() {
       const prevEntry = series.data?.[1]
       const previous = prevEntry?.value || null
 
-      // Format the period nicely
       const periodDate = new Date(entryYear, entryMonth - 1, 1)
       const periodLabel = periodDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
 
-      // Calculate change
       let changeStr = ''
       if (previous && actual) {
         const change = parseFloat(actual) - parseFloat(previous)
         const sign = change >= 0 ? '+' : ''
-        changeStr = ` | Chg: ${sign}${change.toFixed(1)}`
+        changeStr = ` | Chg: ${sign}${change.toFixed(2)}`
       }
 
-      const headline = `⚡ ${meta.name} — ${periodLabel} | Actual: ${actual}${previous ? ` | Prev: ${previous}` : ''}${changeStr}`
+      const releaseTime = getReleaseTimestamp(meta.short)
+      if (!releaseTime) continue
+
+      const releaseDateStr = releaseTime.toISOString().slice(0, 10)
+      if (releaseDateStr < ytdStart || releaseDateStr > todayStr) continue
+
+      const releaseTimeET = releaseTime.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'
+      })
+
+      const headline = `⚡ ${meta.name} — ${periodLabel} | Actual: ${actual}${previous ? ` | Prev: ${previous}` : ''}${changeStr} | Released ${releaseTimeET} ET`
 
       alerts.push({
         id: `bls-${series.seriesID}-${entryYear}-${entryPeriod}`,
@@ -420,7 +488,7 @@ async function fetchBLSAlerts() {
         summary: `${meta.name} for ${periodLabel}. Actual: ${actual}.${previous ? ` Previous: ${previous}.` : ''}`,
         source: 'BLS DATA',
         category: 'Alert',
-        created_at: new Date().toISOString(),
+        created_at: releaseTime.toISOString(),
         isAlert: true,
         alertType: 'economic',
         changePct: 0,
@@ -483,8 +551,19 @@ export default async function handler(req, res) {
       }
     }
 
-    const econAlerts = await fetchBLSAlerts()
-    const allAlerts = [...econAlerts, ...alerts]
+    const [blsAlerts, staticAlerts] = await Promise.all([
+      fetchBLSAlerts(),
+      Promise.resolve(getStaticEconAlerts()),
+    ])
+
+    // Dedupe static vs BLS — BLS wins if both exist for same release
+    const blsIds = new Set(blsAlerts.map(a => a.id))
+    const dedupedStatic = staticAlerts.filter(a => {
+      const short = a.id.split('-')[1]
+      return !blsAlerts.some(b => b.id.includes(short))
+    })
+
+    const allAlerts = [...blsAlerts, ...dedupedStatic, ...alerts]
     allAlerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     res.status(200).json({ alerts: allAlerts, count: allAlerts.length })
   } catch (err) {
