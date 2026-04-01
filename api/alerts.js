@@ -334,110 +334,102 @@ const G20_CURRENCIES = new Set([
   'KRW','MXN','RUB','ZAR','TRY','SAR','ARS','IDR','CHF','SGD'
 ])
 
-async function fetchEconAlerts() {
+const BLS_API_KEY = process.env.BLS_API_KEY || '12eb208862cb4f5b9729e94cae77d50a'
+
+// BLS series IDs for major market-moving releases
+const BLS_SERIES = [
+  { id: 'CUUR0000SA0',  name: 'CPI (All Urban)',        short: 'CPI' },
+  { id: 'WPUFD4',       name: 'PPI Final Demand',        short: 'PPI' },
+  { id: 'CES0000000001',name: 'Nonfarm Payrolls',        short: 'NFP' },
+  { id: 'LNS14000000',  name: 'Unemployment Rate',       short: 'UNRATE' },
+  { id: 'ICSA',         name: 'Initial Jobless Claims',  short: 'CLAIMS' },
+  { id: 'JTS000000000000000HIR', name: 'JOLTS Hires',   short: 'JOLTS' },
+]
+
+async function fetchBLSAlerts() {
   try {
     const now = new Date()
-    const marketClose = new Date()
-    marketClose.setUTCHours(21, 0, 0, 0)
     const marketOpen = new Date()
     marketOpen.setUTCHours(13, 30, 0, 0)
+    const marketClose = new Date()
+    marketClose.setUTCHours(21, 0, 0, 0)
     if (now < marketOpen || now > marketClose) return []
 
-    const todayUTC = now.toISOString().slice(0, 10)
+    const currentYear = now.getFullYear()
+    const currentMonth = now.getMonth() + 1
+    const todayStr = now.toISOString().slice(0, 10)
 
-    const ECON_KEYWORDS = [
-      'nonfarm payroll','jobs report','cpi rose','cpi fell','cpi climbed',
-      'consumer price index','pce','fomc statement','fomc minutes',
-      'fed raises','fed cuts','fed holds','rate hike','rate cut',
-      'gdp grew','gdp fell','gdp rose','gdp contracted','gdp expanded',
-      'unemployment rate','jobless claims','initial claims fell','initial claims rose',
-      'jolts','job openings','retail sales rose','retail sales fell','retail sales climbed',
-      'ism manufacturing','ism services','pmi rose','pmi fell',
-      'ppi rose','ppi fell','producer price',
-      'housing starts','building permits','durable goods',
-      'consumer confidence','consumer sentiment',
-      'trade deficit','trade surplus','trade balance',
-      'personal income','personal spending',
-      'jobs added','payrolls added','economy added',
-      'beats estimate','misses estimate','topped estimate',
-      'came in at','came in above','came in below',
-    ]
+    const body = {
+      seriesid: BLS_SERIES.map(s => s.id),
+      startyear: String(currentYear),
+      endyear: String(currentYear),
+      registrationkey: BLS_API_KEY,
+      catalog: true,
+    }
 
-    const ECON_JUNK = [
-      ' says ',' backs ',' argues ',' warns ',' worries ',
-      ' expects ',' predicts ',' could ',' might ',' may ',
-      ' should ',' would ',' wants ',' hopes ',' urges ',
-      'opinion','analysis','commentary','outlook','preview',
-      'ahead of','what to expect','here is why','explainer',
-      'still backs','still supports','about a point',
-    ]
-
-    const r = await fetch('https://www.cnbc.com/id/10000664/device/rss/rss.html', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-      },
-      signal: AbortSignal.timeout(6000),
+    const r = await fetch('https://api.bls.gov/publicAPI/v2/timeseries/data/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8000),
     })
+
     if (!r.ok) return []
+    const data = await r.json()
+    if (data.status !== 'REQUEST_SUCCEEDED') return []
 
-    const xml = await r.text()
-    const items = []
-    const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
+    const alerts = []
 
-    for (const match of itemMatches) {
-      const block = match[1]
-      const get = (tag) => {
-        const m = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
-        return m ? (m[1] || m[2] || '').trim() : ''
+    for (const series of (data.Results?.series || [])) {
+      const meta = BLS_SERIES.find(s => s.id === series.seriesID)
+      if (!meta) continue
+
+      const latestEntry = series.data?.[0]
+      if (!latestEntry) continue
+
+      // Check if this release is from current or previous month (BLS releases with 1 month lag)
+      const entryYear = parseInt(latestEntry.year)
+      const entryPeriod = latestEntry.period // M01-M12
+      const entryMonth = parseInt(entryPeriod.replace('M', ''))
+
+      // Only alert if it's recent data (this month or last month's release)
+      const monthsOld = (currentYear - entryYear) * 12 + (currentMonth - entryMonth)
+      if (monthsOld > 2) continue
+
+      const actual = latestEntry.value
+      const prevEntry = series.data?.[1]
+      const previous = prevEntry?.value || null
+
+      // Format the period nicely
+      const periodDate = new Date(entryYear, entryMonth - 1, 1)
+      const periodLabel = periodDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+
+      // Calculate change
+      let changeStr = ''
+      if (previous && actual) {
+        const change = parseFloat(actual) - parseFloat(previous)
+        const sign = change >= 0 ? '+' : ''
+        changeStr = ` | Chg: ${sign}${change.toFixed(1)}`
       }
 
-      const title = get('title')
-      const pubDate = get('pubDate')
-      const link = block.match(/<link>\s*(.*?)\s*<\/link>/)?.[1]?.trim() || get('link')
-      const guid = get('guid') || link
+      const headline = `⚡ ${meta.name} — ${periodLabel} | Actual: ${actual}${previous ? ` | Prev: ${previous}` : ''}${changeStr}`
 
-      if (!title) continue
-
-      const titleLower = ' ' + title.toLowerCase() + ' '
-      const isEcon = ECON_KEYWORDS.some(k => titleLower.includes(k))
-      if (!isEcon) continue
-
-      const isJunk = ECON_JUNK.some(k => titleLower.includes(k))
-      if (isJunk) continue
-
-      const pubTime = pubDate ? new Date(pubDate) : null
-      if (!pubTime || isNaN(pubTime)) continue
-
-      const itemUTC = pubTime.toISOString().slice(0, 10)
-      if (itemUTC !== todayUTC) continue
-      if (pubTime > now) continue
-
-      const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(title)
-
-      items.push({
-        id: `econ-${guid}`,
-        headline: `${isSpeaker ? '🎤' : '⚡'} ${title}`,
-        summary: title,
-        source: 'ECON ALERT',
+      alerts.push({
+        id: `bls-${series.seriesID}-${entryYear}-${entryPeriod}`,
+        headline,
+        summary: `${meta.name} for ${periodLabel}. Actual: ${actual}.${previous ? ` Previous: ${previous}.` : ''}`,
+        source: 'BLS DATA',
         category: 'Alert',
-        created_at: pubTime.toISOString(),
+        created_at: new Date(entryYear, entryMonth - 1, 1).toISOString(),
         isAlert: true,
         alertType: 'economic',
         changePct: 0,
-        url: link || null,
       })
     }
 
-    const seen = new Set()
-    return items.filter(item => {
-      if (seen.has(item.headline)) return false
-      seen.add(item.headline)
-      return true
-    }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-
+    return alerts
   } catch (err) {
-    console.error('fetchEconAlerts error:', err)
+    console.error('BLS fetch error:', err)
     return []
   }
 }
@@ -491,7 +483,7 @@ export default async function handler(req, res) {
       }
     }
 
-    const econAlerts = await fetchEconAlerts()
+    const econAlerts = await fetchBLSAlerts()
     const allAlerts = [...econAlerts, ...alerts]
     allAlerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     res.status(200).json({ alerts: allAlerts, count: allAlerts.length })
