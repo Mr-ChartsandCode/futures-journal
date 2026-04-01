@@ -107,24 +107,21 @@ export default async function handler(req, res) {
     const pdfPart = parts.find(p => p.headers.includes('filename'))
     if (!pdfPart) return res.status(400).json({ error: 'No PDF found in request' })
 
-    // Use dynamic import for pdf-parse to avoid ESM issues
-const pdfjsLib = await import('pdfjs-dist/build/pdf.mjs')
-pdfjsLib.GlobalWorkerOptions.workerSrc = ''
-const loadingTask = pdfjsLib.getDocument({ 
-  data: new Uint8Array(pdfPart.data),
-  useWorkerFetch: false,
-  isEvalSupported: false,
-  useSystemFonts: true,
-})
-const pdfDoc = await loadingTask.promise
-let text = ''
-for (let i = 1; i <= pdfDoc.numPages; i++) {
-  const page = await pdfDoc.getPage(i)
-  const content = await page.getTextContent()
-  text += content.items.map(item => item.str).join(' ') + '\n'
-}
-const result = parseDailyStatement(text)
-res.status(200).json(result)
+    // pdf2json works natively in Node.js without browser APIs
+    const { default: PDFParser } = await import('pdf2json')
+    
+    const text = await new Promise((resolve, reject) => {
+      const parser = new PDFParser(null, true)
+      parser.on('pdfParser_dataReady', () => {
+        resolve(parser.getRawTextContent())
+      })
+      parser.on('pdfParser_dataError', reject)
+      parser.parseBuffer(pdfPart.data)
+    })
+
+    console.log('PDF TEXT:', text.slice(0, 300))
+    const result = parseDailyStatement(text)
+    res.status(200).json(result)
   } catch (err) {
     console.error('PDF parse error:', err)
     res.status(500).json({ error: err.message })
