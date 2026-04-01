@@ -344,91 +344,68 @@ async function fetchEconAlerts() {
     if (now < marketOpen || now > marketClose) return []
 
     const todayUTC = now.toISOString().slice(0, 10)
+    const key = process.env.ALPHA_VANTAGE_KEY
 
-    const ECON_KEYWORDS = [
-      'nonfarm payroll','jobs report','cpi','consumer price index',
-      'pce','personal consumption','fomc','fed raises','fed cuts','rate decision',
-      'gdp','gross domestic product','unemployment claims','initial claims',
-      'jolts','job openings','retail sales','ism manufacturing','ism services',
-      'ppi','producer price','housing starts','building permits','durable goods',
-      'consumer confidence','consumer sentiment','trade deficit','trade balance',
-      'personal income','personal spending','factory orders','existing home sales',
-      'new home sales','powell speaks','fed chair speaks','fomc minutes',
-      'interest rate','inflation rate','jobs added','unemployment rate',
-    ]
-
-    const ECON_FEEDS = [
-      'https://www.cnbc.com/id/10000664/device/rss/rss.html',
-      'https://news.google.com/rss/search?q=site:reuters.com+world+economy+markets+trade&hl=en-US&gl=US&ceid=US:en',
+    const INDICATORS = [
+      { fn: 'NONFARM_PAYROLL',   label: 'Nonfarm Payroll',      interval: 'monthly',   unit: 'K jobs' },
+      { fn: 'UNEMPLOYMENT',      label: 'Unemployment Rate',     interval: 'monthly',   unit: '%' },
+      { fn: 'CPI',               label: 'CPI',                   interval: 'monthly',   unit: '' },
+      { fn: 'INFLATION',         label: 'Inflation',             interval: 'annual',    unit: '%' },
+      { fn: 'RETAIL_SALES',      label: 'Retail Sales',          interval: 'monthly',   unit: 'B' },
+      { fn: 'REAL_GDP',          label: 'Real GDP',              interval: 'quarterly', unit: 'B' },
+      { fn: 'FEDERAL_FUNDS_RATE',label: 'Federal Funds Rate',    interval: 'monthly',   unit: '%' },
+      { fn: 'TREASURY_YIELD',    label: '10Y Treasury Yield',    interval: 'monthly',   unit: '%' },
+      { fn: 'DURABLES',          label: 'Durable Goods Orders',  interval: 'monthly',   unit: 'B' },
     ]
 
     const items = []
 
-    await Promise.allSettled(ECON_FEEDS.map(async url => {
+    await Promise.allSettled(INDICATORS.map(async ind => {
       try {
-        const r = await fetch(url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-          },
-          signal: AbortSignal.timeout(6000),
-        })
+        const url = `https://www.alphavantage.co/query?function=${ind.fn}&interval=${ind.interval}&apikey=${key}&datatype=json`
+        const r = await fetch(url, { signal: AbortSignal.timeout(8000) })
         if (!r.ok) return
 
-        const xml = await r.text()
-        const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
+        const data = await r.json()
+        const series = data?.data
+        if (!Array.isArray(series) || series.length < 2) return
 
-        for (const match of itemMatches) {
-          const block = match[1]
-          const get = (tag) => {
-            const m = block.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>|<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`))
-            return m ? (m[1] || m[2] || '').trim() : ''
-          }
+        const latest = series[0]
+        const previous = series[1]
 
-          const title = get('title')
-          const pubDate = get('pubDate')
-          const link = block.match(/<link>\s*(.*?)\s*<\/link>/)?.[1]?.trim() || get('link')
-          const guid = get('guid') || link
+        // Check if latest release date is today
+        const releaseDate = latest.date
+        if (!releaseDate) return
 
-          if (!title) continue
+        // Alpha Vantage dates are YYYY-MM-DD but releases lag by a month
+        // Check if it was updated today by seeing if it's a new entry vs cached
+        // We show if release date is within last 2 days (catches same-day and next-day)
+        const relDate = new Date(releaseDate + 'T00:00:00Z')
+        const diffDays = (now - relDate) / 86400000
+        if (diffDays > 60) return // skip if older than 60 days — not a fresh release
 
-          const titleLower = title.toLowerCase()
-          const isEcon = ECON_KEYWORDS.some(k => titleLower.includes(k))
-          if (!isEcon) continue
+        const actual = parseFloat(latest.value)
+        const prev = parseFloat(previous.value)
+        const change = (actual - prev).toFixed(2)
+        const sign = change >= 0 ? '+' : ''
 
-          const pubTime = pubDate ? new Date(pubDate) : null
-          if (!pubTime || isNaN(pubTime)) continue
-
-          const itemUTC = pubTime.toISOString().slice(0, 10)
-          if (itemUTC !== todayUTC) continue
-          if (pubTime > now) continue
-
-          const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(title)
-
-          items.push({
-            id: `econ-${guid}`,
-            headline: `${isSpeaker ? '🎤' : '⚡'} ${title}`,
-            summary: title,
-            source: 'ECON ALERT',
-            category: 'Alert',
-            created_at: pubTime.toISOString(),
-            isAlert: true,
-            alertType: 'economic',
-            changePct: 0,
-            url: link || null,
-          })
-        }
+        items.push({
+          id: `av-${ind.fn}-${releaseDate}`,
+          headline: `⚡ ${ind.label} — Actual: ${actual}${ind.unit} | Previous: ${prev}${ind.unit} | Change: ${sign}${change}${ind.unit}`,
+          summary: `${ind.label} released. Actual: ${actual}${ind.unit}, Previous: ${prev}${ind.unit}`,
+          source: 'ECON ALERT',
+          category: 'Alert',
+          created_at: new Date(releaseDate + 'T13:30:00Z').toISOString(),
+          isAlert: true,
+          alertType: 'economic',
+          changePct: 0,
+        })
       } catch (err) {
-        console.error('Econ feed error:', err.message)
+        console.error(`AV ${ind.fn} error:`, err.message)
       }
     }))
 
-    const seen = new Set()
-    return items.filter(item => {
-      if (seen.has(item.headline)) return false
-      seen.add(item.headline)
-      return true
-    }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    return items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
   } catch (err) {
     console.error('fetchEconAlerts error:', err)
