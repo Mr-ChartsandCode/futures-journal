@@ -13,15 +13,15 @@ function timeAgo(dateStr) {
 
 function sourceColor(source) {
   const s = (source || '').toUpperCase()
-  if (s.includes('CNBC'))        return { color: '#ff4444', bg: '#1a0000', border: '#600000' }
-  if (s.includes('AL JAZEERA'))  return { color: '#ff8c00', bg: '#1a0800', border: '#603000' }
-  if (s.includes('REUTERS'))     return { color: '#ff6b35', bg: '#1a0a00', border: '#602000' }
-  if (s.includes('AP'))          return { color: '#cc4444', bg: '#180000', border: '#500000' }
-  if (s.includes('POLITICO'))    return { color: '#a070ff', bg: '#0e0018', border: '#400080' }
-  if (s.includes('NOTUS'))       return { color: '#40c0aa', bg: '#001a16', border: '#006050' }
-  if (s.includes('COMMODITIES')) return { color: '#ffd700', bg: '#1a1400', border: '#605000' }
-  if (s.includes('GOOGLE'))      return { color: '#70c0ff', bg: '#001428', border: '#003080' }
-  return                                { color: '#70c0ff', bg: '#001428', border: '#003080' }
+  if (s.includes('CNBC'))        return { color: '#ff4444', bg: '#000000', border: '#600000' }
+  if (s.includes('AL JAZEERA'))  return { color: '#ff8c00', bg: '#000000', border: '#603000' }
+  if (s.includes('REUTERS'))     return { color: '#ff6b35', bg: '#000000', border: '#602000' }
+  if (s.includes('AP'))          return { color: '#cc4444', bg: '#000000', border: '#500000' }
+  if (s.includes('POLITICO'))    return { color: '#a070ff', bg: '#000000', border: '#400080' }
+  if (s.includes('NOTUS'))       return { color: '#40c0aa', bg: '#000000', border: '#006050' }
+  if (s.includes('COMMODITIES')) return { color: '#ffd700', bg: '#000000', border: '#605000' }
+  if (s.includes('GOOGLE'))      return { color: '#70c0ff', bg: '#000000', border: '#003080' }
+  return                                { color: '#70c0ff', bg: '#000000', border: '#003080' }
 }
 
 export default function NewsFeed() {
@@ -95,11 +95,6 @@ export default function NewsFeed() {
         </div>
       ) : (
         <div style={{ flex: 1, overflowY: 'auto' }}>
-          {filtered.length === 0 && (
-            <div style={{ padding: 24, color: '#555', fontSize: 12, textAlign: 'center', letterSpacing: '0.05em' }}>
-              NO STORIES IN THIS CATEGORY
-            </div>
-          )}
           {filtered.map(article => {
             const isLive = Date.now() - new Date(article.created_at).getTime() < 300000
             return (
@@ -114,16 +109,16 @@ export default function NewsFeed() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7 }}>
                     {article.isAlert ? (
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#000000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         ⚡ ALERT
                       </span>
                     ) : (
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: sourceColor(article.source).bg, color: sourceColor(article.source).color, border: `1px solid ${sourceColor(article.source).border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: sourceColor(article.source).bg, color: sourceColor(article.source).color, border: `1px solid ${sourceColor(article.source).border}`, letterSpacing: '0.06em', flexShrink: 0 }}>
                         {article.source?.toUpperCase()}
                       </span>
                     )}
                     {isLive && !article.isAlert && (
-                      <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 6px', borderRadius: 3, background: '#1a0000', color: '#ff4444', border: '1px solid #600000', letterSpacing: '0.06em', flexShrink: 0 }}>
                         LIVE
                       </span>
                     )}
@@ -131,13 +126,13 @@ export default function NewsFeed() {
                       {timeAgo(article.created_at)}
                     </span>
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.5, color: '#f0f0f0' }}>
+                  <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.5, color: '#f0f0f0' }}>
                     {article.headline}
                   </div>
                 </div>
                 {article.url && (
                   <a href={article.url} target="_blank" rel="noopener noreferrer" style={{
-                    fontSize: 10, fontWeight: 700, color: 'var(--blue-text)',
+                    fontSize: 13, fontWeight: 700, color: 'var(--blue-text)',
                     letterSpacing: '0.06em', textDecoration: 'none',
                     border: '1px solid var(--blue-dim)', padding: '6px 12px',
                     borderRadius: 6, whiteSpace: 'nowrap', flexShrink: 0,
