@@ -71,15 +71,15 @@ export default function NewsFeed() {
 
       <div style={{ borderBottom: '1px solid var(--border)', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(180deg,#0f0f0f,#000)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#f0f0f0' }}>
+          <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: '#f0f0f0' }}>
             News Wire
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 10, color: '#888', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: 20, color: '#888', letterSpacing: '0.05em' }}>
             {filtered.length} STORIES · AUTO REFRESH
           </span>
-          <button onClick={fetchNews} style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
+          <button onClick={fetchNews} style={{ fontSize: 20, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)', letterSpacing: '0.05em' }}>
             ↻ REFRESH
           </button>
         </div>
@@ -122,11 +122,11 @@ export default function NewsFeed() {
                         LIVE
                       </span>
                     )}
-                    <span style={{ fontSize: 11, color: '#666' }}>
+                    <span style={{ fontSize: 13, color: '#666' }}>
                       {timeAgo(article.created_at)}
                     </span>
                   </div>
-                  <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.5, color: '#f0f0f0' }}>
+                  <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.5, color: '#f0f0f0' }}>
                     {article.headline}
                   </div>
                 </div>
