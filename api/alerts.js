@@ -196,7 +196,7 @@ async function fetchForexFactoryAlerts() {
         }
       }
 
-      const headline = `${emoji} ${e.title} (${e.country}) — ${eventDateStr === todayStr ? 'Today' : eventDateStr} | Actual: ${e.actual}${e.forecast ? ` | Fcst: ${e.forecast}` : ''}${e.previous ? ` | Prev: ${e.previous}` : ''}${changeStr} | Released ${releaseTimeET} ET`
+      const headline = `${emoji} ${e.title} (${e.country}) — ${eventDateStr === todayStr ? 'Today' : eventDateStr} | Actual: ${e.actual}${e.forecast ? ` | Fcst: ${e.forecast}` : ''}${e.previous ? ` | Prev: ${e.previous}` : ''}${changeStr} | Released ${releaseTimeET}`
 
       alerts.push({
         id: `ff-${e.title}-${e.date}`,
@@ -284,7 +284,7 @@ async function fetchBLSAlerts() {
         hour: 'numeric', minute: '2-digit', timeZone: 'America/Denver'
       })
 
-      const headline = `⚡ ${meta.name} — ${periodLabel} | Actual: ${actual}${previous ? ` | Prev: ${previous}` : ''}${changeStr} | Released ${releaseTimeET} ET`
+      const headline = `⚡ ${meta.name} — ${periodLabel} | Actual: ${actual}${previous ? ` | Prev: ${previous}` : ''}${changeStr} | Released ${releaseTimeET}`
 
       alerts.push({
         id: `bls-${series.seriesID}-${entryYear}-${entryPeriod}`,

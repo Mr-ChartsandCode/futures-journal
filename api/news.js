@@ -32,7 +32,8 @@ const JUNK_PHRASES = [
   'transgender', 'athletes', 'prayers', 'score', 'fan', 'stadium', 'world cup', 'playoff',
   'NBA', 'luncheon', 'lunch with', 'charity','opinion', 'tea','endorses', 'Stocks Rise', 'Stocks Fall',
   'New Super-App', 'displacement', 'Emissions', 'nasa', 'tsunami', 'probes', 'polluted', 'no one', 'everyone',
-  'tmz', 'bill ackman', 'maha', 'maga', 'medical', 'Stocks Advance', 'Stocks Decline'
+  'tmz', 'bill ackman', 'maha', 'maga', 'medical', 'Stocks Advance', 'Stocks Decline', 'Selling Merch',
+  
 ]
 
 const EARNINGS_JUNK = [
@@ -86,7 +87,7 @@ const ALWAYS_PASS = [
   's&p 500','nasdaq','dow jones','nyse','russell',
   'tariff','trade war','trade deal','trade deficit',
   'dollar index','euro zone','eurozone','ecb','boj','boe','imf','world bank',
-  'war','military strike','airstrike','missile','nuclear','nuclear energy',
+  'military strike','airstrike','missile','nuclear','nuclear energy',
   'sanctions','embargo','ceasefire','conflict','explosion',
   'china','russia','ukraine','israel','iran','taiwan','north korea',
   'middle east','gulf','strait of hormuz','kremlin',
