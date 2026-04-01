@@ -307,15 +307,8 @@ export default async function handler(req, res) {
       fetchForexFactoryAlerts(),
     ])
 
-    // ForexFactory is most real-time — dedupe BLS and FRED against it
-    const ffTitles = new Set(ffAlerts.map(a => a.id))
-    const dedupedBLS = blsAlerts.filter(a => !ffAlerts.some(f => f.headline.includes(a.source)))
-    const dedupedFred = fredAlerts.filter(a => !ffAlerts.some(f => {
-      const fredName = FRED_SERIES.find(s => a.id.includes(s.id))?.name || ''
-      return f.headline.toLowerCase().includes(fredName.toLowerCase().slice(0, 8))
-    }))
-
-    const allAlerts = [...ffAlerts, ...dedupedBLS, ...dedupedFred, ...alerts]
+    // Combine all — no deduplication, each source covers different data
+    const allAlerts = [...ffAlerts, ...blsAlerts, ...fredAlerts, ...alerts]
     allAlerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     res.status(200).json({ alerts: allAlerts, count: allAlerts.length })
   } catch (err) {
