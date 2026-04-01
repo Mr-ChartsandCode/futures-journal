@@ -453,6 +453,79 @@ async function fetchFREDAlerts() {
   }
 }
 
+async function fetchForexFactoryAlerts() {
+  try {
+    const now = new Date()
+    const todayStr = now.toISOString().slice(0, 10)
+    const ytdStart = `${now.getFullYear()}-01-01`
+
+    const r = await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json', {
+      headers: { 'User-Agent': 'Mozilla/5.0' },
+      signal: AbortSignal.timeout(6000),
+    })
+    if (!r.ok) return []
+    const data = await r.json()
+
+    const HIGH_IMPACT = new Set([
+      'USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF'
+    ])
+
+    const alerts = []
+    const nowTime = now.getTime()
+
+    for (const e of (Array.isArray(data) ? data : [])) {
+      if (!HIGH_IMPACT.has(e.country)) continue
+      if (e.impact !== 'High' && e.impact !== 'Medium') continue
+
+      const eventTime = new Date(e.date)
+      const eventDateStr = eventTime.toISOString().slice(0, 10)
+
+      // Only today's events that have already released
+      if (eventDateStr !== todayStr) continue
+      if (eventTime.getTime() > nowTime) continue
+
+      // Must have actual value to show
+      if (!e.actual || e.actual === '') continue
+
+      const releaseTimeET = eventTime.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'
+      })
+
+      const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(e.title)
+      const emoji = isSpeaker ? '🎤' : '⚡'
+
+      let changeStr = ''
+      if (e.actual && e.previous) {
+        const act = parseFloat(e.actual)
+        const prev = parseFloat(e.previous)
+        if (!isNaN(act) && !isNaN(prev)) {
+          const chg = act - prev
+          changeStr = ` | Chg: ${chg >= 0 ? '+' : ''}${chg.toFixed(2)}`
+        }
+      }
+
+      const headline = `${emoji} ${e.title} (${e.country}) — ${eventDateStr === todayStr ? 'Today' : eventDateStr} | Actual: ${e.actual}${e.forecast ? ` | Fcst: ${e.forecast}` : ''}${e.previous ? ` | Prev: ${e.previous}` : ''}${changeStr} | Released ${releaseTimeET} ET`
+
+      alerts.push({
+        id: `ff-${e.title}-${e.date}`,
+        headline,
+        summary: `${e.title} (${e.country}). Actual: ${e.actual}.${e.forecast ? ` Forecast: ${e.forecast}.` : ''}${e.previous ? ` Previous: ${e.previous}.` : ''}`,
+        source: 'ECON RELEASE',
+        category: 'Alert',
+        created_at: eventTime.toISOString(),
+        isAlert: true,
+        alertType: 'economic',
+        changePct: 0,
+      })
+    }
+
+    return alerts
+  } catch (err) {
+    console.error('ForexFactory error:', err)
+    return []
+  }
+}
+
 async function fetchBLSAlerts() {
   try {
     const now = new Date()
@@ -590,9 +663,10 @@ export default async function handler(req, res) {
       }
     }
 
-    const [blsAlerts, fredAlerts] = await Promise.all([
+    const [blsAlerts, fredAlerts, ffAlerts] = await Promise.all([
       fetchBLSAlerts(),
       fetchFREDAlerts(),
+      fetchForexFactoryAlerts(),
     ])
 
     // Dedupe — BLS wins over FRED if both cover same indicator
@@ -602,7 +676,18 @@ export default async function handler(req, res) {
       return !short || !blsShorts.has(short)
     })
 
-    const allAlerts = [...blsAlerts, ...dedupedFred, ...alerts]
+    // FF alerts win for same-day actual data — dedupe by title
+    const ffTitles = new Set(ffAlerts.map(a => {
+      const title = a.id.replace('ff-','').split('-')[0]
+      return title.toLowerCase()
+    }))
+
+    const dedupedBLS = blsAlerts.filter(a => {
+      const name = BLS_SERIES.find(s => a.id.includes(s.id))?.name?.toLowerCase() || ''
+      return !ffTitles.has(name)
+    })
+
+    const allAlerts = [...ffAlerts, ...dedupedBLS, ...dedupedFred, ...alerts]
     allAlerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     res.status(200).json({ alerts: allAlerts, count: allAlerts.length })
   } catch (err) {
