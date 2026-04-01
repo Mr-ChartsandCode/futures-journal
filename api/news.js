@@ -30,7 +30,9 @@ const JUNK_PHRASES = [
   'quiz', 'crossword', 'podcast', 'listen now', 'watch now',
   'photos', 'video:', 'gallery', ' democrats', 'republicans', 'pope', 'god', 'players', 'games',
   'transgender', 'athletes', 'prayers', 'score', 'fan', 'stadium', 'world cup', 'playoff',
-  'NBA', 'luncheon', 'lunch with', 'charity','opinion', 'tea','endorses',
+  'NBA', 'luncheon', 'lunch with', 'charity','opinion', 'tea','endorses', 'Stocks Rise', 'Stocks Fall',
+  'New Super-App', 'displacement', 'Emissions', 'nasa', 'tsunami', 'probes', 'polluted', 'no one', 'everyone',
+  'tmz', 'bill ackman', 'maha', 'maga', 'medical', 
 ]
 
 const EARNINGS_JUNK = [
