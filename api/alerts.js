@@ -341,43 +341,39 @@ async function fetchEconAlerts() {
     marketClose.setUTCHours(21, 0, 0, 0)
     const marketOpen = new Date()
     marketOpen.setUTCHours(13, 30, 0, 0)
-
     if (now < marketOpen || now > marketClose) return []
 
     const todayUTC = now.toISOString().slice(0, 10)
 
-    const ECON_FEEDS = [
-      { url: 'https://tradingeconomics.com/rss/releases.aspx', label: 'Trading Economics' },
-      { url: 'https://www.bls.gov/feed/bls_latest.rss', label: 'BLS' },
-      { url: 'https://www.federalreserve.gov/feeds/press_all.xml', label: 'Federal Reserve' },
+    const ECON_KEYWORDS = [
+      'nonfarm payroll','jobs report','cpi','consumer price index',
+      'pce','personal consumption','fomc','fed raises','fed cuts','rate decision',
+      'gdp','gross domestic product','unemployment claims','initial claims',
+      'jolts','job openings','retail sales','ism manufacturing','ism services',
+      'ppi','producer price','housing starts','building permits','durable goods',
+      'consumer confidence','consumer sentiment','trade deficit','trade balance',
+      'personal income','personal spending','factory orders','existing home sales',
+      'new home sales','powell speaks','fed chair speaks','fomc minutes',
+      'interest rate','inflation rate','jobs added','unemployment rate',
     ]
 
-    const HIGH_IMPACT = [
-      'nonfarm','cpi','pce','fomc','rate decision','gdp','unemployment',
-      'jolts','retail sales','ism','ppi','payroll','powell','fed chair',
-      'consumer price','producer price','housing starts','durable goods',
-      'consumer confidence','consumer sentiment','initial claims',
-      'trade balance','current account','inflation','interest rate',
-      'manufacturing','services pmi','core retail','personal income',
-      'personal spending','factory orders','building permits',
+    const ECON_FEEDS = [
+      'https://www.cnbc.com/id/10000664/device/rss/rss.html',
+      'https://news.google.com/rss/search?q=site:reuters.com+world+economy+markets+trade&hl=en-US&gl=US&ceid=US:en',
     ]
 
     const items = []
 
-    await Promise.allSettled(ECON_FEEDS.map(async feed => {
+    await Promise.allSettled(ECON_FEEDS.map(async url => {
       try {
-        const r = await fetch(feed.url, {
+        const r = await fetch(url, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36',
             'Accept': 'application/rss+xml, application/xml, text/xml, */*',
           },
           signal: AbortSignal.timeout(6000),
         })
-        if (!r.ok) {
-          console.log(`[${feed.label}] FAILED status:`, r.status)
-          return
-        }
-        console.log(`[${feed.label}] fetched OK, status:`, r.status)
+        if (!r.ok) return
 
         const xml = await r.text()
         const itemMatches = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)]
@@ -395,10 +391,10 @@ async function fetchEconAlerts() {
           const guid = get('guid') || link
 
           if (!title) continue
+
           const titleLower = title.toLowerCase()
-          const isHighImpact = HIGH_IMPACT.some(k => titleLower.includes(k))
-          console.log(`[${feed.label}] ITEM:`, title, '| pubDate:', pubDate)
-          if (!isHighImpact) continue
+          const isEcon = ECON_KEYWORDS.some(k => titleLower.includes(k))
+          if (!isEcon) continue
 
           const pubTime = pubDate ? new Date(pubDate) : null
           if (!pubTime || isNaN(pubTime)) continue
@@ -410,7 +406,7 @@ async function fetchEconAlerts() {
           const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(title)
 
           items.push({
-            id: `econ-${guid}-${feed.label}`,
+            id: `econ-${guid}`,
             headline: `${isSpeaker ? '🎤' : '⚡'} ${title}`,
             summary: title,
             source: 'ECON ALERT',
@@ -423,11 +419,10 @@ async function fetchEconAlerts() {
           })
         }
       } catch (err) {
-        console.error(`${feed.label} econ feed error:`, err.message)
+        console.error('Econ feed error:', err.message)
       }
     }))
 
-    // Dedupe by title
     const seen = new Set()
     return items.filter(item => {
       if (seen.has(item.headline)) return false

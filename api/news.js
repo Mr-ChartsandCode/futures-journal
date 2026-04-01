@@ -9,9 +9,7 @@ const FEEDS = [
   { url: 'https://news.google.com/rss/search?q=site:reuters.com+world+economy+markets+trade&hl=en-US&gl=US&ceid=US:en', label: 'Reuters World Economy' },
   { url: 'https://news.google.com/rss/search?q=site:apnews.com+business+economy+markets&hl=en-US&gl=US&ceid=US:en', label: 'AP Business' },
   { url: 'https://feeds.content.dowjones.io/public/rss/RSSWorldNews', label: 'WSJ World News'},
-  { url: 'https://www.bls.gov/feed/bls_latest.rss', label: 'BLS Data' },
-  { url: 'https://www.federalreserve.gov/feeds/press_all.xml', label: 'Federal Reserve' },
-  { url: 'https://tradingeconomics.com/rss/releases.aspx', label: 'Economic Releases' },
+
 ]
 
 
