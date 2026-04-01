@@ -70,10 +70,11 @@ const FRED_SERIES = [
   { id: 'A191RL1Q225SBEA',   name: 'GDP Growth Rate QoQ',         short: 'GDP',            source: 'BEA' },
   { id: 'DGORDER',           name: 'Durable Goods Orders MoM',    short: 'DURABLE',        source: 'CENSUS' },
   { id: 'EXHOSLUSM495S',     name: 'Existing Home Sales',         short: 'EXISTING_HOME',  source: 'NAR' },
-  { id: 'NAPM',              name: 'ISM Manufacturing PMI',        short: 'ISM_MFG',        source: 'ISM' },
-  { id: 'NMFCI',             name: 'ISM Services PMI',             short: 'ISM_SVCS',       source: 'ISM' },
+  { id: 'MANEMP',            name: 'ISM Manufacturing PMI',        short: 'ISM_MFG',        source: 'ISM' },
+  { id: 'NMFBAI',            name: 'ISM Services PMI',             short: 'ISM_SVCS',       source: 'ISM' },
   { id: 'FEDFUNDS',          name: 'Fed Interest Rate Decision',   short: 'FOMC',           source: 'FEDERAL RESERVE' },
   { id: 'DPCCRV1M086SBEA',   name: 'Core PCE MoM % Change',       short: 'COREPCE_PCT',    source: 'BEA' },
+  { id: 'RSAFS',             name: 'Retail Sales MoM',             short: 'RETAIL',         source: 'CENSUS' },
 ]
 
 async function fetchFREDAlerts() {
@@ -158,53 +159,42 @@ async function fetchForexFactoryAlerts() {
     if (!r.ok) return []
     const data = await r.json()
 
-    const HIGH_IMPACT = new Set([
-      'USD','EUR','GBP','JPY','CAD','AUD','NZD','CHF'
-    ])
-
+    const HIGH_IMPACT = ['USD']
     const alerts = []
-    const nowTime = now.getTime()
 
     for (const e of (Array.isArray(data) ? data : [])) {
-      if (!HIGH_IMPACT.has(e.country)) continue
+      if (e.country !== 'USD') continue
       if (e.impact !== 'High' && e.impact !== 'Medium') continue
+      if (!e.actual) continue // only show if actual is released
 
-      const eventTime = new Date(e.date)
-      const eventDateStr = eventTime.toISOString().slice(0, 10)
+      const eventDate = new Date(e.date)
+      const eventDateStr = eventDate.toISOString().slice(0, 10)
+      if (eventDateStr < ytdStart || eventDateStr > todayStr) continue
 
-      // Only today's events that have already released
-      if (eventDateStr !== todayStr) continue
-      if (eventTime.getTime() > nowTime) continue
-
-      // Must have actual value to show
-      if (!e.actual || e.actual === '') continue
-
-      const releaseTimeET = eventTime.toLocaleTimeString('en-US', {
-        hour: 'numeric', minute: '2-digit', timeZone: 'America/Denver'
+      const releaseTimeET = eventDate.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York'
       })
 
-      const isSpeaker = /speaks|speech|press conference|remarks|testimony/i.test(e.title)
-      const emoji = isSpeaker ? '🎤' : '⚡'
-
       let changeStr = ''
-      if (e.actual && e.previous) {
-        const act = parseFloat(e.actual)
+      if (e.previous && e.actual) {
+        const actual = parseFloat(e.actual)
         const prev = parseFloat(e.previous)
-        if (!isNaN(act) && !isNaN(prev)) {
-          const chg = act - prev
-          changeStr = ` | Chg: ${chg >= 0 ? '+' : ''}${chg.toFixed(2)}`
+        if (!isNaN(actual) && !isNaN(prev)) {
+          const change = actual - prev
+          const sign = change >= 0 ? '+' : ''
+          changeStr = ` | Chg: ${sign}${change.toFixed(2)}`
         }
       }
 
-      const headline = `${emoji} ${e.title} (${e.country}) — ${eventDateStr === todayStr ? 'Today' : eventDateStr} | Actual: ${e.actual}${e.forecast ? ` | Fcst: ${e.forecast}` : ''}${e.previous ? ` | Prev: ${e.previous}` : ''}${changeStr} | Released ${releaseTimeET}`
+      const headline = `⚡ ${e.title} — Actual: ${e.actual}${e.forecast ? ` | Forecast: ${e.forecast}` : ''}${e.previous ? ` | Prev: ${e.previous}` : ''}${changeStr} | Released ${releaseTimeET} ET`
 
       alerts.push({
-        id: `ff-${e.title}-${e.date}`,
+        id: `ff-${e.title}-${eventDateStr}`,
         headline,
-        summary: `${e.title} (${e.country}). Actual: ${e.actual}.${e.forecast ? ` Forecast: ${e.forecast}.` : ''}${e.previous ? ` Previous: ${e.previous}.` : ''}`,
-        source: 'ECON RELEASE',
+        summary: `${e.title}. Actual: ${e.actual}.${e.forecast ? ` Forecast: ${e.forecast}.` : ''}`,
+        source: 'ECON DATA',
         category: 'Alert',
-        created_at: eventTime.toISOString(),
+        created_at: eventDate.toISOString(),
         isAlert: true,
         alertType: 'economic',
         changePct: 0,
@@ -213,7 +203,7 @@ async function fetchForexFactoryAlerts() {
 
     return alerts
   } catch (err) {
-    console.error('ForexFactory error:', err)
+    console.error('ForexFactory alerts error:', err)
     return []
   }
 }
@@ -321,23 +311,13 @@ export default async function handler(req, res) {
       fetchForexFactoryAlerts(),
     ])
 
-    // Dedupe — BLS wins over FRED if both cover same indicator
-    const blsShorts = new Set(BLS_SERIES.map(s => s.short))
-    const dedupedFred = fredAlerts.filter(a => {
-      const short = FRED_SERIES.find(s => a.id.includes(s.id))?.short
-      return !short || !blsShorts.has(short)
-    })
-
-    // FF alerts win for same-day actual data — dedupe by title
-    const ffTitles = new Set(ffAlerts.map(a => {
-      const title = a.id.replace('ff-','').split('-')[0]
-      return title.toLowerCase()
+    // ForexFactory is most real-time — dedupe BLS and FRED against it
+    const ffTitles = new Set(ffAlerts.map(a => a.id))
+    const dedupedBLS = blsAlerts.filter(a => !ffAlerts.some(f => f.headline.includes(a.source)))
+    const dedupedFred = fredAlerts.filter(a => !ffAlerts.some(f => {
+      const fredName = FRED_SERIES.find(s => a.id.includes(s.id))?.name || ''
+      return f.headline.toLowerCase().includes(fredName.toLowerCase().slice(0, 8))
     }))
-
-    const dedupedBLS = blsAlerts.filter(a => {
-      const name = BLS_SERIES.find(s => a.id.includes(s.id))?.name?.toLowerCase() || ''
-      return !ffTitles.has(name)
-    })
 
     const allAlerts = [...ffAlerts, ...dedupedBLS, ...dedupedFred, ...alerts]
     allAlerts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
