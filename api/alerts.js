@@ -346,6 +346,13 @@ async function fetchEconAlerts() {
     const todayUTC = now.toISOString().slice(0, 10)
     const key = process.env.ALPHA_VANTAGE_KEY
 
+    // Debug — log one indicator to see structure
+    try {
+      const testR = await fetch(`https://www.alphavantage.co/query?function=CPI&interval=monthly&apikey=${key}`)
+      const testD = await testR.json()
+      console.log('AV CPI SAMPLE:', JSON.stringify(testD?.data?.slice(0, 3), null, 2))
+    } catch(e) { console.log('AV test error:', e.message) }
+
     const INDICATORS = [
       { fn: 'NONFARM_PAYROLL',   label: 'Nonfarm Payroll',      interval: 'monthly',   unit: 'K jobs' },
       { fn: 'UNEMPLOYMENT',      label: 'Unemployment Rate',     interval: 'monthly',   unit: '%' },
