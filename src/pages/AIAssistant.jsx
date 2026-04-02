@@ -8,6 +8,7 @@
 // Ask for a score — end every chart analysis request with "rate this setup 1-10" so you get a consistent framework over time.
 
 import { useState, useRef, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 const QUICK_ACTIONS = [
   { label: '📊 Analyze My Chart', prompt: 'Attach a chart screenshot and I\'ll break down the setup, key levels, and whether I\'d take the trade.' },
@@ -70,6 +71,13 @@ export default function AIAssistant() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [pendingImage, setPendingImage] = useState(null)
+  const [userId, setUserId] = useState(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) setUserId(data.user.id)
+    })
+  }, [])
   const bottomRef = useRef(null)
   const fileRef = useRef(null)
   const textareaRef = useRef(null)
@@ -97,8 +105,9 @@ export default function AIAssistant() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-        messages: apiMessages,
-        image: image || null,
+          messages: apiMessages,
+          image: image || null,
+          userId,
         })
       })
 

@@ -1,6 +1,55 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '@supabase/supabase-js'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY || process.env.VITE_SUPABASE_ANON_KEY
+)
+
+async function fetchTradeContext(userId) {
+  if (!userId) return ''
+  try {
+    const since = new Date()
+    since.setDate(since.getDate() - 30)
+    const sinceStr = since.toISOString().slice(0, 10)
+
+    const { data: trades } = await supabase
+      .from('trades')
+      .select('trade_date, instrument, direction, contracts, entry_price, exit_price, pnl, emotion, notes, trade_tags(tags(name))')
+      .eq('user_id', userId)
+      .gte('trade_date', sinceStr)
+      .order('trade_date', { ascending: false })
+      .limit(100)
+
+    if (!trades?.length) return 'No trades in the last 30 days.'
+
+    const wins = trades.filter(t => t.pnl > 0)
+    const losses = trades.filter(t => t.pnl < 0)
+    const totalPnl = trades.reduce((s, t) => s + t.pnl, 0)
+    const winRate = ((wins.length / trades.length) * 100).toFixed(0)
+    const avgWin = wins.length ? (wins.reduce((s,t) => s+t.pnl,0)/wins.length).toFixed(0) : 0
+    const avgLoss = losses.length ? (losses.reduce((s,t) => s+t.pnl,0)/losses.length).toFixed(0) : 0
+
+    const tradeLines = trades.slice(0, 50).map(t => {
+      const tags = t.trade_tags?.map(tt => tt.tags?.name).filter(Boolean).join(', ') || 'untagged'
+      const pnlStr = t.pnl >= 0 ? `+$${t.pnl}` : `-$${Math.abs(t.pnl)}`
+      return `${t.trade_date} | ${t.instrument} ${t.direction?.toUpperCase()} ${t.contracts}ct | Entry: ${t.entry_price} Exit: ${t.exit_price} | ${pnlStr} | ${tags} | ${t.emotion || 'no emotion logged'}`
+    }).join('\n')
+
+    return `
+APPRENTICE TRADE HISTORY — LAST 30 DAYS (${trades.length} trades):
+Total P&L: ${totalPnl >= 0 ? '+' : ''}$${totalPnl.toFixed(0)} | Win Rate: ${winRate}% | Avg Win: $${avgWin} | Avg Loss: $${avgLoss}
+
+RECENT TRADES:
+${tradeLines}
+`
+  } catch (err) {
+    console.error('Trade context error:', err)
+    return ''
+  }
+}
 
 const SYSTEM_PROMPT = `You are an elite futures trading coach embedded in a professional trading terminal.
 You specialize in ES, NQ, CL, GC, auction market theory, the 30-second opening range, and orderflow concepts.
@@ -285,7 +334,11 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   try {
-    const { messages, image } = req.body
+    const { messages, image, userId } = req.body
+    const tradeContext = await fetchTradeContext(userId)
+    const systemWithContext = tradeContext
+      ? `${SYSTEM_PROMPT}\n\n---\nAPPRENTICE TRADE DATA:\n${tradeContext}`
+      : SYSTEM_PROMPT
 
     const recentMessages = messages.slice(-5)
     const apiMessages = recentMessages.map((m, i) => {
@@ -304,7 +357,7 @@ export default async function handler(req, res) {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-5',
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: systemWithContext,
       messages: apiMessages,
     })
 
