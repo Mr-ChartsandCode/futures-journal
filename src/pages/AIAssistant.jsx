@@ -8,9 +8,15 @@
 // Ask for a score — end every chart analysis request with "rate this setup 1-10" so you get a consistent framework over time.
 
 import { useState, useRef, useEffect } from 'react'
-import { useTrades } from '../hooks/useTrades'
-import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+
+const QUICK_ACTIONS = [
+  { label: '📊 Analyze My Chart', prompt: 'Attach a chart screenshot and I\'ll break down the setup, key levels, and whether I\'d take the trade.' },
+  { label: '📈 Best ES Setups', prompt: 'What are the highest probability ES setups to trade during the NY session? Walk me through entry, stop, and target for each.' },
+  { label: '⚡ VWAP Strategies', prompt: 'Give me your best VWAP-based trading strategies for ES and NQ futures. Entry criteria, stop placement, and targets.' },
+  { label: '🎯 Opening Range', prompt: 'Break down the opening range breakout strategy for ES futures. What makes a valid breakout vs a fake?' },
+  { label: '🧠 Psychology Check', prompt: 'What are the most common psychological mistakes futures traders make and how do I fix them?' },
+  { label: '📅 Fill Out My DRC', prompt: 'Fill out my DRC based on everything we discussed today.' },
+]
 
 function Message({ msg }) {
   const isUser = msg.role === 'user'
@@ -132,8 +138,10 @@ export default function AIAssistant() {
           <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: '0.05em', color: '#f0f0f0', textTransform: 'uppercase' }}>
             AI Trading Coach
           </span>
-          <div style={{ display: 'flex', gap: 8 }}>
-          </div>
+          <button onClick={() => setMessages([{ role: 'assistant', content: "Hey! I'm your AI trading coach." }])}
+          style={{ fontSize: 12, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)' }}>
+          NEW CHAT
+        </button>
         </div>
       </div>
 
