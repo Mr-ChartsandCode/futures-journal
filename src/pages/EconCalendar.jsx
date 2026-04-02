@@ -169,6 +169,9 @@ export default function EconCalendar() {
                       {countryBadge(event.country)}{event.title}
                     </div>
                       <div style={{ display: 'flex', gap: 12, fontSize: 11 }}>
+                        {event.actual && (
+                          <span style={{ color: '#555', fontSize: 14 }}>Actual: <span style={{ color: parseFloat(event.actual) >= parseFloat(event.forecast) ? '#70c0ff' : '#ff6060', fontWeight: 700 }}>{event.actual}</span></span>
+                        )}
                         {event.forecast && (
                           <span style={{ color: '#555', fontSize: 14 }}>Forecast: <span style={{ color: '#888' }}>{event.forecast}</span></span>
                         )}
