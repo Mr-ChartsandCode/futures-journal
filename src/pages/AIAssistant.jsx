@@ -10,14 +10,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-const QUICK_ACTIONS = [
-  { label: '📊 Analyze My Chart', prompt: 'Attach a chart screenshot and I\'ll break down the setup, key levels, and whether I\'d take the trade.' },
-  { label: '📈 Best ES Setups', prompt: 'What are the highest probability ES setups to trade during the NY session? Walk me through entry, stop, and target for each.' },
-  { label: '⚡ VWAP Strategies', prompt: 'Give me your best VWAP-based trading strategies for ES and NQ futures. Entry criteria, stop placement, and targets.' },
-  { label: '🎯 Opening Range', prompt: 'Break down the opening range breakout strategy for ES futures. What makes a valid breakout vs a fake?' },
-  { label: '🧠 Psychology Check', prompt: 'What are the most common psychological mistakes futures traders make and how do I fix them?' },
-  { label: '📅 Fill Out My DRC', prompt: 'Fill out my DRC based on everything we discussed today.' },
-]
+
 
 function Message({ msg }) {
   const isUser = msg.role === 'user'
@@ -188,19 +181,6 @@ function handleFileUpload(e) {
 
       <div style={{ borderTop: '1px solid #1a1a1a', padding: '12px 16px', background: '#000', flexShrink: 0 }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
-          {QUICK_ACTIONS.map(action => (
-            <button key={action.label} onClick={() => sendMessage(action.prompt)}
-              disabled={loading}
-              style={{
-                fontSize: 15, padding: '5px 10px', borderRadius: 6, cursor: loading ? 'default' : 'pointer',
-                fontFamily: 'var(--font)', border: '1px solid #1e1e1e',
-                background: '#0a0a0a', color: loading ? '#333' : '#888',
-                transition: 'all 0.15s',
-              }}
-              onMouseEnter={e => { if (!loading) { e.target.style.borderColor = '#003080'; e.target.style.color = '#70c0ff' }}}
-              onMouseLeave={e => { e.target.style.borderColor = '#1e1e1e'; e.target.style.color = loading ? '#333' : '#888' }}
-            >{action.label}</button>
-          ))}
         </div>
 
         {pendingImage && (
