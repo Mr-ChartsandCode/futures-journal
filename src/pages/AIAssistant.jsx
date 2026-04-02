@@ -135,12 +135,6 @@ export default function AIAssistant() {
           <div style={{ display: 'flex', gap: 8 }}>
           </div>
         </div>
-        <button onClick={() => setMessages([{
-          role: 'assistant',
-          content: "Hey! I'm your AI trading coach. I have access to your trade journal and can analyze charts you share with me.\n\nUse the quick actions below to get started, or ask me anything about your trading.",
-        }])} style={{ fontSize: 14, padding: '4px 10px', borderRadius: 4, border: '1px solid var(--border2)', background: 'transparent', color: '#888', cursor: 'pointer', fontFamily: 'var(--font)' }}>
-          NEW CHAT
-        </button>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
