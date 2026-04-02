@@ -12,15 +12,6 @@ import { useTrades } from '../hooks/useTrades'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
-const QUICK_ACTIONS = [
-  { label: '📊 Analyze My Chart', prompt: 'Attach a chart screenshot and I\'ll break down the setup, key levels, and whether I\'d take the trade.' },
-  { label: '📈 Best ES Setups', prompt: 'What are the highest probability ES setups to trade during the NY session? Walk me through entry, stop, and target for each.' },
-  { label: '⚡ VWAP Strategies', prompt: 'Give me your best VWAP-based trading strategies for ES and NQ futures. Entry criteria, stop placement, and targets.' },
-  { label: '🎯 Opening Range', prompt: 'Break down the opening range breakout strategy for ES futures. What makes a valid breakout vs a fake?' },
-  { label: '🧠 Trading Psychology', prompt: 'What are the most common psychological mistakes futures traders make and how do I fix them?' },
-  { label: '📅 Market Structure', prompt: 'Explain how to read market structure in ES futures — higher highs, lower lows, and how to trade with the trend.' },
-]
-
 function Message({ msg }) {
   const isUser = msg.role === 'user'
   return (
@@ -68,7 +59,7 @@ function Message({ msg }) {
 export default function AIAssistant() {
   const [messages, setMessages] = useState([{
     role: 'assistant',
-    content: "Hey! I'm your AI trading coach. I have access to your trade journal and can analyze charts you share with me.\n\nUse the quick actions below to get started, or ask me anything about your trading.",
+    content: "Hey! I'm your AI trading coach.",
   }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
