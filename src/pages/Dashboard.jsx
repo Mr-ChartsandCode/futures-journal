@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isWeekend } from 'date-fns'
 import { supabase } from '../lib/supabase'
+import ImportCSV from '../components/ImportCSV'
 
 const tip = {
   contentStyle: { background: '#0c0c1e', border: '1px solid #2a2a4a', borderRadius: 6, fontSize: 15, boxShadow: '0 4px 20px rgba(0,0,20,0.8)' },
@@ -174,6 +175,7 @@ export default function Dashboard() {
             ))}
           </div>
           <button className="btn-primary" onClick={() => navigate('/add')} style={{ padding: '6px 14px' }}>+ NEW TRADE</button>
+          <ImportCSV onImport={() => window.location.reload()} />
         </div>
       </div>
 
