@@ -112,15 +112,31 @@ export default function AIAssistant() {
     setLoading(false)
   }
 
-  function handleImageUpload(e) {
+function handleFileUpload(e) {
     const file = e.target.files[0]
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const base64 = reader.result.split(',')[1]
-      setPendingImage({ data: base64, mediaType: file.type })
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1]
+        setPendingImage({ data: base64, mediaType: file.type })
+      }
+      reader.readAsDataURL(file)
+    } else {
+      // CSV or text file — read as text and inject into message
+      const reader = new FileReader()
+      reader.onload = () => {
+        const text = reader.result
+        const preview = text.slice(0, 3000) // limit to avoid token explosion
+        setInput(prev =>
+          prev
+            ? `${prev}\n\n[CSV DATA]\n${preview}`
+            : `Here is my trade data from today:\n\n[CSV DATA]\n${preview}`
+        )
+      }
+      reader.readAsText(file)
     }
-    reader.readAsDataURL(file)
   }
 
   function handleKeyDown(e) {
@@ -192,7 +208,7 @@ export default function AIAssistant() {
             padding: '8px 10px', borderRadius: 6, border: '1px solid #1e1e1e',
             background: '#0a0a0a', color: '#666', cursor: 'pointer', fontSize: 20, flexShrink: 0,
           }}>📎</button>
-          <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+          <input ref={fileRef} type="file" accept="image/*,.csv,.txt" onChange={handleFileUpload} style={{ display: 'none' }} />
 
           <textarea
             ref={textareaRef}
